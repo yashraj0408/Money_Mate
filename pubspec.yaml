@@ -2,7 +2,6 @@ name: money_mate
 description: A new Flutter project.
 
 publish_to:
-
 version: 1.0.0+1
 
 environment:
@@ -31,7 +30,7 @@ flutter:
   uses-material-design: true
   assets:
     - images/
-    - .env
+
 
 
 
