@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     kInputTextDecoration.copyWith(hintText: 'Enter your email'),
               ),
               SizedBox(
-                height: 8.0,
+                height: 15,
               ),
               TextField(
                 obscureText: true,
@@ -62,8 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 24.0,
               ),
               RoundedButton(
-                color: purple,
-                buttonText: 'LogIn',
+                color: kPurple,
+                buttonText: 'Log in',
                 onPressed: () async {
                   try {
                     setState(() {

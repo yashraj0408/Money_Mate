@@ -47,7 +47,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     kInputTextDecoration.copyWith(hintText: 'Enter your email'),
               ),
               SizedBox(
-                height: 8.0,
+                height: 15,
               ),
               TextField(
                 obscureText: true,
@@ -61,8 +61,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 height: 24.0,
               ),
               RoundedButton(
-                color: purple,
-                buttonText: 'Signup',
+                color: kPurple,
+                buttonText: 'Sign up',
                 onPressed: () async {
                   setState(() {
                     showSpinner = true;

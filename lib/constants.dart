@@ -29,15 +29,17 @@ const kInputTextDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
   focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: lightblue, width: 2.0),
+    borderSide: BorderSide(color: kLightBlue, width: 2.0),
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
 );
 
 // const bgColor = Color(0xff17183c); //dark blue-accent
-const bgColor = Color(0XFF0A0E21); // bluish-black
-const purple = Color(0xff8d48e4);
-const lightblue = Color(0xff18bbf8);
+const kBgColor = Color(0XFF0A0E21); // bluish-black
+const kPurple = Color(0xff8d48e4);
+const kLightBlue = Color(0xff18bbf8);
+const kCardColor = Color(0x80474C66);
+// const kCardColor = Colors.blue;
 // bg blue -> #17183c
 // purple -> #8d48e4
 // light blue -> #18bbf8

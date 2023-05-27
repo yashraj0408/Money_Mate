@@ -27,7 +27,8 @@ class MoneyMate extends StatelessWidget {
 
       initialRoute: '/',
       routes: {
-        '/': (context) => WelcomeScreen(),
+        // '/': (context) => WelcomeScreen(),
+        '/': (context) => Dashboard(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegistrationScreen(),
         '/dashboard': (context) => Dashboard(),

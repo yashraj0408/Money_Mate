@@ -23,7 +23,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
 
     // animation = CurvedAnimation(parent: controller, curve: Curves.bounceIn);
-    animation = ColorTween(begin: lightblue, end: bgColor).animate(controller);
+    animation =
+        ColorTween(begin: kLightBlue, end: kBgColor).animate(controller);
     controller.forward();
     controller.addListener(() {
       // print(animation.value);
@@ -70,14 +71,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               height: 48.0,
             ),
             RoundedButton(
-                color: lightblue,
-                buttonText: 'Login',
+                color: kLightBlue,
+                buttonText: 'Log in',
                 onPressed: () {
                   Navigator.pushNamed(context, '/login');
                 }),
             RoundedButton(
-                color: purple,
-                buttonText: 'Signup',
+                color: kPurple,
+                buttonText: 'Sign up',
                 onPressed: () {
                   Navigator.pushNamed(context, '/register');
                 }),
