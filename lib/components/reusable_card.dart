@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 class ReusableCard extends StatelessWidget {
   final Color colour;
-  Widget? cardChild;
-  ReusableCard({required this.colour, this.cardChild});
+  final Widget? cardChild;
+  double aspectRatio;
+
+  ReusableCard({required this.colour, this.cardChild, double? aspectRatio})
+      : aspectRatio = aspectRatio ?? 3.5;
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: cardChild,
+      child: AspectRatio(
+        aspectRatio: aspectRatio,
+        child: cardChild,
+      ),
       margin: EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: colour,
