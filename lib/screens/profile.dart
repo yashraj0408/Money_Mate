@@ -18,7 +18,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      body: Text("hi"), // Existing code...
+      // body: Text("hi"), // Existing code...
       bottomNavigationBar: BottomNavBar(),
     );
   }

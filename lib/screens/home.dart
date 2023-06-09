@@ -28,7 +28,7 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Row(children: [
                     const CircleAvatar(
-                      radius: 30,
+                      radius: 20,
                       backgroundImage: AssetImage('images/dp.png'),
                     ),
                     SizedBox(width: 15),
@@ -37,10 +37,11 @@ class _DashboardState extends State<Dashboard> {
                       children: const [
                         Text(
                           "Hey, Yash",
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 5),
                         Text(
-                          "Welcome to back to Moneymate",
+                          "Welcome back to Moneymate",
                         ),
                       ],
                     )

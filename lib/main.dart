@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/screens/assets.dart';
-import 'package:money_mate/screens/dashboard.dart';
+import 'package:money_mate/screens/home.dart';
 import 'package:money_mate/screens/welcome_screen.dart';
 import 'package:money_mate/screens/login_screen.dart';
 import 'package:money_mate/screens/registration_screen.dart';
