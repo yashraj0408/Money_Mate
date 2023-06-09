@@ -6,13 +6,21 @@ import 'package:money_mate/screens/login_screen.dart';
 import 'package:money_mate/screens/registration_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'screens/input_page.dart';
+import 'screens/profile.dart';
 import 'constants.dart';
+import 'package:provider/provider.dart';
+import 'services/nav_provider.dart';
 
 // void main() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MoneyMate());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => NavigationProvider(),
+      child: MoneyMate(),
+    ),
+  );
 }
 
 class MoneyMate extends StatelessWidget {
@@ -36,7 +44,7 @@ class MoneyMate extends StatelessWidget {
         '/register': (context) => RegistrationScreen(),
         '/home': (context) => Dashboard(),
         '/assets': (context) => Assets(),
-        // '/profile': (context) => Profile(),
+        '/profile': (context) => Profile(),
       },
       // home: InputPage(),
     );
