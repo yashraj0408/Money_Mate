@@ -8,6 +8,14 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -149,6 +157,28 @@ class _DashboardState extends State<Dashboard> {
               ),
             ],
           ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          // backgroundColor: Color.fromRGBO(71, 76, 102, 0.49),
+          backgroundColor: kCardColor,
+          // selectedItemColor: Color.fromRGBO(141, 72, 228, 0.49),
+          selectedItemColor: kLightBlue,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.money),
+              label: 'Portfolio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
         ),
       ),
     );
