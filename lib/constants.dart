@@ -35,10 +35,12 @@ const kInputTextDecoration = InputDecoration(
 );
 
 // const bgColor = Color(0xff17183c); //dark blue-accent
-const kBgColor = Color(0XFF0A0E21); // bluish-black
+// const kBgColor = Color(0XFF0A0E21); // bluish-black - prev
+const kBgColor = Color(0XFF18222c); // bluish-black
 const kPurple = Color(0xff8d48e4);
 const kLightBlue = Color(0xff18bbf8);
-const kCardColor = Color(0x80474C66);
+const kCardColor = Color(0xff233446);
+const kNavbarColor = Color(0xff203040);
 // const kCardColor = Colors.blue;
 // bg blue -> #17183c
 // purple -> #8d48e4

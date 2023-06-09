@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/screens/assets.dart';
 import 'package:money_mate/screens/dashboard.dart';
 import 'package:money_mate/screens/welcome_screen.dart';
 import 'package:money_mate/screens/login_screen.dart';
 import 'package:money_mate/screens/registration_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'screens/input_page.dart';
+import 'constants.dart';
 
 // void main() async {
 void main() async {
@@ -20,9 +22,10 @@ class MoneyMate extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
-          primary: Color(0XFF0A0E21),
+          primary: kBgColor,
+          // primary: Color(0XFF18222c),
         ),
-        scaffoldBackgroundColor: Color(0XFF0A0E21),
+        scaffoldBackgroundColor: kBgColor,
       ),
 
       initialRoute: '/',
@@ -31,7 +34,9 @@ class MoneyMate extends StatelessWidget {
         '/': (context) => Dashboard(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegistrationScreen(),
-        '/dashboard': (context) => Dashboard(),
+        '/home': (context) => Dashboard(),
+        '/assets': (context) => Assets(),
+        // '/profile': (context) => Profile(),
       },
       // home: InputPage(),
     );
