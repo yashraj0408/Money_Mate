@@ -9,6 +9,7 @@ class Assets extends StatefulWidget {
 
 class _AssetsState extends State<Assets> {
   List<String> portfolioItems = [];
+  ScrollController _scrollController = ScrollController();
 
   void _showInputDialog() {
     showDialog(
@@ -68,6 +69,13 @@ class _AssetsState extends State<Assets> {
                           portfolioItems.add(inputText);
                         });
                         Navigator.of(context).pop();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        });
                       },
                       child: const Text(
                         'Create',
@@ -101,6 +109,7 @@ class _AssetsState extends State<Assets> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            controller: _scrollController,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
