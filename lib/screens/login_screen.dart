@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     final user = await _auth.signInWithEmailAndPassword(
                         email: email, password: password);
                     if (user != null) {
-                      Navigator.pushNamed(context, '/dashboard');
+                      Navigator.pushNamed(context, '/home');
                     }
                     setState(() {
                       showSpinner = false;

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:money_mate/components/bottom_nav_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:money_mate/services/nav_provider.dart';
 
 class Assets extends StatefulWidget {
   @override
@@ -11,8 +8,6 @@ class Assets extends StatefulWidget {
 class _AssetsState extends State<Assets> {
   @override
   Widget build(BuildContext context) {
-    final navigationProvider = Provider.of<NavigationProvider>(context);
-    navigationProvider.setIndex(1);
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -30,7 +25,7 @@ class _AssetsState extends State<Assets> {
           children: [],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      // bottomNavigationBar: BottomNavBar(),
     );
   }
 }

@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/constants.dart';
 import 'package:money_mate/components/reusable_card.dart';
-import 'package:money_mate/components/bottom_nav_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:money_mate/services/nav_provider.dart';
 
-class Dashboard extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<Home> createState() => _HomeState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    final navigationProvider = Provider.of<NavigationProvider>(context);
-    navigationProvider.setIndex(0);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -178,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      // bottomNavigationBar: BottomNavBar(),
     );
   }
 }
