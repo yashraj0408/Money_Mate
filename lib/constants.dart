@@ -20,6 +20,7 @@ const kMessageContainerDecoration = BoxDecoration(
 
 const kInputTextDecoration = InputDecoration(
   hintText: 'Enter a value',
+  // labelText: 'Portfolio Name',
   contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
   border: OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(10.0)),

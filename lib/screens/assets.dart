@@ -10,6 +10,80 @@ class Assets extends StatefulWidget {
 class _AssetsState extends State<Assets> {
   List<String> portfolioItems = [];
 
+  void _showInputDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String inputText = '';
+
+        return Dialog(
+          backgroundColor: kCardColor, // Set the background color of the dialog
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+                10.0), // Apply rounded corners to the dialog
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Create Portfolio',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                TextField(
+                  onChanged: (value) {
+                    inputText = value;
+                  },
+                  decoration: kInputTextDecoration.copyWith(
+                    hintText: '',
+                    labelText: 'Portfolio Name',
+                    labelStyle: TextStyle(color: Colors.white),
+                  ),
+                  // InputDecoration(
+                  //   border: OutlineInputBorder(),
+                  //   labelText: 'Portfolio Name',
+                  // ),
+                ),
+                const SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: kLightBlue),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          portfolioItems.add(inputText);
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Create',
+                        style: TextStyle(color: kLightBlue),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,18 +108,15 @@ class _AssetsState extends State<Assets> {
                 children: [
                   Text(
                     portfolioItems.isEmpty
-                        ? "Seems like you don’t have any portfolio. Create one."
+                        ? "Seems like you don’t have any portfolio.\nCreate one.\n\n👇"
                         : "Your Portfolio:",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   if (portfolioItems.isEmpty)
                     ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          portfolioItems.add("New Portfolio Item");
-                        });
-                      },
+                      onPressed: _showInputDialog,
                       child: Icon(Icons.add),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
@@ -64,11 +135,6 @@ class _AssetsState extends State<Assets> {
                               title: Text(item),
                             ),
                           ),
-                        // Card(
-                        //   child: ListTile(
-                        //     title: Text(item),
-                        //   ),
-                        // ),
                       ],
                     ),
                   SizedBox(
@@ -81,16 +147,12 @@ class _AssetsState extends State<Assets> {
                         Padding(
                           padding: const EdgeInsets.only(left: 17, right: 17),
                           child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                portfolioItems.add("New Portfolio Item");
-                              });
-                            },
+                            onPressed: _showInputDialog,
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.add,
-                                  size: 30,
+                                  size: 25,
                                 ),
                                 SizedBox(
                                   width: 10,
@@ -104,7 +166,7 @@ class _AssetsState extends State<Assets> {
                                     15), // Adjust the radius as needed
                               ),
                               padding: EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 24),
+                                  vertical: 14, horizontal: 24),
                               backgroundColor: kPurple,
                             ),
                           ),

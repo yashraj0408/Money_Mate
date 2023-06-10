@@ -9,6 +9,7 @@ import 'screens/profile.dart';
 import 'constants.dart';
 import 'package:provider/provider.dart';
 import 'services/nav_provider.dart';
+import 'screens/welcome_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,9 +30,13 @@ class MoneyMate extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
           primary: kBgColor,
+
           // primary: Color(0XFF18222c),
         ),
         scaffoldBackgroundColor: kBgColor,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: Colors.white,
+        ),
       ),
 
       initialRoute: '/',
