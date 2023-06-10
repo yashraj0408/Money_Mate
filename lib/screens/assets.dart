@@ -45,10 +45,6 @@ class _AssetsState extends State<Assets> {
                     labelText: 'Portfolio Name',
                     labelStyle: TextStyle(color: Colors.white),
                   ),
-                  // InputDecoration(
-                  //   border: OutlineInputBorder(),
-                  //   labelText: 'Portfolio Name',
-                  // ),
                 ),
                 const SizedBox(height: 16.0),
                 Row(
@@ -69,10 +65,11 @@ class _AssetsState extends State<Assets> {
                           portfolioItems.add(inputText);
                         });
                         Navigator.of(context).pop();
+                        //scroll to the end
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           _scrollController.animateTo(
                             _scrollController.position.maxScrollExtent,
-                            duration: Duration(milliseconds: 300),
+                            duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOut,
                           );
                         });
@@ -104,7 +101,7 @@ class _AssetsState extends State<Assets> {
           ),
         ),
         centerTitle: false,
-        title: Text('MoneyMate'),
+        title: const Text('MoneyMate'),
       ),
       body: SafeArea(
         child: Center(
@@ -117,9 +114,12 @@ class _AssetsState extends State<Assets> {
                 children: [
                   Text(
                     portfolioItems.isEmpty
-                        ? "Seems like you don’t have any portfolio.\nCreate one.\n\n👇"
+                        ? "Seems like you don’t have any portfolio.\nCreate one.\n👇"
                         : "Your Portfolio:",
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      height: 1.7,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
@@ -141,7 +141,23 @@ class _AssetsState extends State<Assets> {
                             aspectRatio: 4,
                             colour: kCardColor,
                             cardChild: ListTile(
-                              title: Text(item),
+                              title: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 10, top: 0, bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                       ],
@@ -174,7 +190,7 @@ class _AssetsState extends State<Assets> {
                                 borderRadius: BorderRadius.circular(
                                     15), // Adjust the radius as needed
                               ),
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   vertical: 14, horizontal: 24),
                               backgroundColor: kPurple,
                             ),
