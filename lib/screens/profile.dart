@@ -1,8 +1,10 @@
+import 'dart:io'; // Add this import statement
 import 'package:flutter/material.dart';
-import 'package:money_mate/components/reusable_card.dart';
-import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:money_mate/constants.dart';
+import 'package:money_mate/components/reusable_card.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -10,15 +12,50 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String userName = 'John Doe';
-  String email = 'abc@gmail.com';
-  String profileImageUrl = 'https://example.com/profile_image.jpg';
+  late String uid;
+  String userName = '';
+  late String email;
+  late String profileImageUrl;
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  Future<void> getUserData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        uid = user.uid;
+        if (userName.isEmpty) {
+          // Fetch the name only if it's not already stored
+          userName = user.displayName ?? '';
+        }
+        email = user.email ?? '';
+        profileImageUrl = user.photoURL ?? '';
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+      // Handle any errors that occur while fetching user data
+    }
+  }
 
   void editProfile() async {
     final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return EditProfileDialog();
+        return EditProfileDialog(
+          uid: uid,
+          userName: userName,
+          email: email,
+          onUpdateProfile: updateProfile,
+        );
       },
     );
     if (result != null) {
@@ -30,92 +67,126 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void updateProfile(String newName) {
+    setState(() {
+      userName = newName;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ReusableCard(
-                  colour: kNavbarColor,
-                  aspectRatio: 1,
-                  cardChild: Column(
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 70.0,
-                        // backgroundImage: NetworkImage(profileImageUrl),
-                        backgroundImage: AssetImage("images/dp.png"),
+                      ReusableCard(
+                        colour: kNavbarColor,
+                        aspectRatio: 1,
+                        cardChild: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 70.0,
+                              backgroundImage: profileImageUrl != ''
+                                  ? NetworkImage(profileImageUrl)
+                                  : AssetImage("images/dp.png")
+                                      as ImageProvider<Object>?,
+                            ),
+                            SizedBox(height: 24.0),
+                            Text(
+                              userName,
+                              style: TextStyle(
+                                  fontSize: 24.0, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              email,
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 24.0),
-                      Text(
-                        userName,
-                        style: TextStyle(
-                            fontSize: 24.0, fontWeight: FontWeight.bold),
+                      SizedBox(height: 20.0),
+                      ElevatedButton.icon(
+                        onPressed: editProfile,
+                        icon: Icon(Icons.edit),
+                        label: Text('Edit Profile'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          textStyle: TextStyle(fontSize: 18.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                10.0), // Set your desired radius here
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12.0),
+                        ),
                       ),
-                      SizedBox(height: 8.0),
-                      Text(
-                        email,
-                        style: TextStyle(fontSize: 18.0),
+                      SizedBox(
+                        height: 25,
+                      ),
+                      Container(
+                        width: 150,
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            try {
+                              await FirebaseAuth.instance.signOut();
+                              // Navigate to the login screen or any other desired screen
+                              // after successful logout
+                              Navigator.pushReplacementNamed(context, '/login');
+                            } catch (e) {
+                              print(e.toString());
+                              // Handle any errors that occur during logout
+                            }
+                          },
+                          icon: Icon(Icons.logout),
+                          label: Text('Logout'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            textStyle: TextStyle(fontSize: 18.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  10.0), // Set your desired radius here
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12.0),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 20.0),
-                ElevatedButton.icon(
-                  onPressed: editProfile,
-                  icon: Icon(Icons.edit),
-                  label: Text('Edit Profile'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    textStyle: TextStyle(fontSize: 18.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          10.0), // Set your desired radius here
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  ),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                Container(
-                  width: 150,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.logout),
-                    label: Text('Logout'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      textStyle: TextStyle(fontSize: 18.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            10.0), // Set your desired radius here
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
 
 class EditProfileDialog extends StatefulWidget {
+  final String uid;
+  final String userName;
+  final String email;
+  final Function(String) onUpdateProfile;
+
+  EditProfileDialog({
+    required this.uid,
+    required this.userName,
+    required this.email,
+    required this.onUpdateProfile,
+  });
+
   @override
   _EditProfileDialogState createState() => _EditProfileDialogState();
 }
@@ -123,13 +194,13 @@ class EditProfileDialog extends StatefulWidget {
 class _EditProfileDialogState extends State<EditProfileDialog> {
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  File? selectedImage;
+  File? selectedImage; // Add this line
 
   @override
   void initState() {
     super.initState();
-    userNameController.text = 'John Doe';
-    emailController.text = '1234567890';
+    userNameController.text = widget.userName;
+    emailController.text = widget.email;
   }
 
   void selectImage() async {
@@ -138,13 +209,54 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     // Replace this code with your image selection logic
   }
 
-  void saveProfile() {
-    final Map<String, dynamic> editedProfile = {
-      'userName': userNameController.text,
-      'email': emailController.text,
-      'profileImageUrl': selectedImage != null ? selectedImage!.path : '',
-    };
-    Navigator.pop(context, editedProfile);
+  void saveProfile() async {
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // Show a loading dialog
+          return Center(
+            child: SpinKitFadingCircle(
+              color: Colors.blue,
+              size: 50.0,
+            ),
+          );
+        },
+      );
+
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user
+            .updatePhotoURL(selectedImage != null ? selectedImage!.path : '');
+        await user.updateDisplayName(userNameController.text);
+
+        // Update the email in Firebase Authentication
+        if (emailController.text != user.email) {
+          await user.updateEmail(emailController.text);
+        }
+
+        // Update the user document in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.uid)
+            .update({
+          'displayName': userNameController.text,
+          'email': emailController.text,
+          'profileImageUrl': selectedImage != null ? selectedImage!.path : '',
+        });
+        final editedProfile = {
+          'userName': userNameController.text,
+          'email': emailController.text,
+          'photoURL': selectedImage != null ? selectedImage!.path : '',
+        };
+        Navigator.pop(context);
+        Navigator.pop(context, editedProfile);
+        widget.onUpdateProfile(userNameController.text);
+      }
+    } catch (e) {
+      print(e.toString());
+      // Handle any errors that occur while saving the profile
+    }
   }
 
   @override
@@ -167,7 +279,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             SizedBox(height: 16.0),
             TextFormField(
               controller: userNameController,
-              decoration: kInputTextDecoration.copyWith(
+              decoration: InputDecoration(
                 hintText: '',
                 labelText: 'Name',
                 labelStyle: TextStyle(color: Colors.white),
@@ -176,7 +288,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             SizedBox(height: 16.0),
             TextFormField(
               controller: emailController,
-              decoration: kInputTextDecoration.copyWith(
+              decoration: InputDecoration(
                 hintText: '',
                 labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.white),

@@ -18,6 +18,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
 
+  Future<void> _saveUserProfile(User user) async {
+    try {
+      await user.updateDisplayName(name);
+
+      await _firestore.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'displayName': name,
+        'photoURL': null, // Set initial photoURL to null or any default value
+        'email': email,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +99,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         email: email, password: password);
 
                     if (newUser != null) {
+                      await _saveUserProfile(newUser.user!);
                       Navigator.pushNamed(context, '/dashboard');
                     }
                     setState(() {
