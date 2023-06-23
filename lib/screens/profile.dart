@@ -1,7 +1,8 @@
-import 'dart:io'; // Add this import statement
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:money_mate/constants.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -15,7 +16,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String uid;
   String userName = '';
   late String email;
-  late String profileImageUrl;
+  late String photoURL;
 
   bool isLoading = true;
 
@@ -35,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
           userName = user.displayName ?? '';
         }
         email = user.email ?? '';
-        profileImageUrl = user.photoURL ?? '';
+        photoURL = user.photoURL ?? '';
         setState(() {
           isLoading = false;
         });
@@ -62,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         userName = result['userName'];
         email = result['email'];
-        profileImageUrl = result['profileImageUrl'];
+        photoURL = result['photoURL'];
       });
     }
   }
@@ -98,8 +99,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             CircleAvatar(
                               radius: 70.0,
-                              backgroundImage: profileImageUrl != ''
-                                  ? NetworkImage(profileImageUrl)
+                              backgroundImage: photoURL != ''
+                                  ? NetworkImage(photoURL)
                                   : AssetImage("images/dp.png")
                                       as ImageProvider<Object>?,
                             ),
@@ -194,7 +195,7 @@ class EditProfileDialog extends StatefulWidget {
 class _EditProfileDialogState extends State<EditProfileDialog> {
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  File? selectedImage; // Add this line
+  File? selectedImage;
 
   @override
   void initState() {
@@ -203,13 +204,9 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     emailController.text = widget.email;
   }
 
-  void selectImage() async {
-    // Code to select image from file system
-    // Here, we assume it is stored in the selectedImage variable
-    // Replace this code with your image selection logic
-  }
+  Future<void> selectImage() async {}
 
-  void saveProfile() async {
+  Future<void> saveProfile() async {
     try {
       showDialog(
         context: context,
@@ -226,8 +223,6 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
 
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await user
-            .updatePhotoURL(selectedImage != null ? selectedImage!.path : '');
         await user.updateDisplayName(userNameController.text);
 
         // Update the email in Firebase Authentication
@@ -242,7 +237,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             .update({
           'displayName': userNameController.text,
           'email': emailController.text,
-          'profileImageUrl': selectedImage != null ? selectedImage!.path : '',
+          'photoUrl': selectedImage != null ? selectedImage!.path : '',
         });
         final editedProfile = {
           'userName': userNameController.text,
