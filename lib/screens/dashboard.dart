@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Home(),
                   Assets(),
-                  Profile(),
+                  ProfilePage(),
                 ],
               ),
             ),

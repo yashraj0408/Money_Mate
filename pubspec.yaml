@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   firebase_core: ^2.11.0
   firebase_auth: ^4.5.0
-  cloud_firestore: ^4.6.0
+  cloud_firestore: ^4.8.1
   modal_progress_hud_nsn: ^0.3.0
   flutter_dotenv: ^5.0.2
   provider: ^6.0.0

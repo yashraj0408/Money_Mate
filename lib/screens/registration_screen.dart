@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/components/rounded_buttton.dart';
 import 'package:money_mate/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -10,10 +11,12 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  late String name;
   late String email;
   late String password;
   bool showSpinner = false;
   final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +42,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 height: 48.0,
               ),
               TextField(
+                onChanged: (value) {
+                  name = value;
+                },
+                decoration:
+                    kInputTextDecoration.copyWith(hintText: 'Full name'),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              TextField(
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (value) {
                   email = value;
                 },
-                decoration:
-                    kInputTextDecoration.copyWith(hintText: 'Enter your email'),
+                decoration: kInputTextDecoration.copyWith(hintText: 'Email'),
               ),
               SizedBox(
                 height: 15,
@@ -54,8 +66,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onChanged: (value) {
                   password = value;
                 },
-                decoration: kInputTextDecoration.copyWith(
-                    hintText: 'Enter your password'),
+                decoration:
+                    kInputTextDecoration.copyWith(hintText: 'Create password'),
               ),
               SizedBox(
                 height: 24.0,
@@ -72,7 +84,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         email: email, password: password);
 
                     if (newUser != null) {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushNamed(context, '/dashboard');
                     }
                     setState(() {
                       showSpinner = false;

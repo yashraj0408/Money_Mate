@@ -41,13 +41,14 @@ class MoneyMate extends StatelessWidget {
 
       initialRoute: '/',
       routes: {
-        // '/': (context) => WelcomeScreen(),
-        '/': (context) => Dashboard(),
+        '/': (context) => WelcomeScreen(),
+        // '/': (context) => Dashboard(),
+        '/dashboard': (context) => Dashboard(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegistrationScreen(),
         '/home': (context) => Home(),
         '/assets': (context) => Assets(),
-        '/profile': (context) => Profile(),
+        '/profile': (context) => ProfilePage(),
       },
       // home: InputPage(),
     );
