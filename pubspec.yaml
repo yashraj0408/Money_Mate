@@ -21,7 +21,6 @@ dependencies:
   provider: ^6.0.0
   flutter_spinkit: ^5.1.0
   image_picker: ^0.8.9
-  dependencies:
   firebase_storage: ^11.2.3
 
 
