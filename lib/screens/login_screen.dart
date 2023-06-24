@@ -3,6 +3,7 @@ import 'package:money_mate/components/rounded_buttton.dart';
 import 'package:money_mate/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:money_mate/screens/registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -81,10 +82,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     print(e);
                   }
                 },
-
-                // onPressed: () {
-                //                 //   Navigator.pushNamed(context, '/dashboard');
-                //                 // },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Dont have an account?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  RegistrationScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                          transitionDuration: const Duration(milliseconds: 50),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -315,12 +315,18 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
               children: [
                 ElevatedButton(
                   onPressed: selectImage,
-                  child: Text('Browse profile Picture'),
+                  child: Text('Change profile Picture'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPurple,
                   ),
                 ),
                 SizedBox(width: 16.0),
+                if (selectedImage != null)
+                  Icon(
+                    Icons.contact_page_outlined,
+                    size: 26.0,
+                    color: kPurple,
+                  ),
               ],
             ),
             SizedBox(height: 16.0),
@@ -337,7 +343,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                 SizedBox(width: 16.0),
                 ElevatedButton(
                   onPressed: saveProfile,
-                  child: Text('Save Profile'),
+                  child: Text('Update Profile'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kLightBlue,
                   ),
