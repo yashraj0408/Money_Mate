@@ -2,10 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:image_picker/image_picker.dart';
 import 'package:money_mate/constants.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String uid;
   String userName = '';
   late String email;
-  late String photoURL;
+  String? imageUrl;
 
   bool isLoading = true;
 
@@ -36,7 +37,6 @@ class _ProfilePageState extends State<ProfilePage> {
           userName = user.displayName ?? '';
         }
         email = user.email ?? '';
-        photoURL = user.photoURL ?? '';
         setState(() {
           isLoading = false;
         });
@@ -55,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
           uid: uid,
           userName: userName,
           email: email,
+          imageUrl: imageUrl,
           onUpdateProfile: updateProfile,
         );
       },
@@ -63,14 +64,16 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         userName = result['userName'];
         email = result['email'];
-        photoURL = result['photoURL'];
+        imageUrl = result['imageUrl'];
       });
     }
   }
 
-  void updateProfile(String newName) {
+  void updateProfile(String newName, String? newUrl) {
     setState(() {
       userName = newName;
+      // email = newEmail;
+      imageUrl = newUrl;
     });
   }
 
@@ -99,8 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             CircleAvatar(
                               radius: 70.0,
-                              backgroundImage: photoURL != ''
-                                  ? NetworkImage(photoURL)
+                              backgroundImage: imageUrl != null
+                                  ? NetworkImage(imageUrl!)
                                   : AssetImage("images/dp.png")
                                       as ImageProvider<Object>?,
                             ),
@@ -179,12 +182,14 @@ class EditProfileDialog extends StatefulWidget {
   final String uid;
   final String userName;
   final String email;
-  final Function(String) onUpdateProfile;
+  final String? imageUrl;
+  final Function(String, String?) onUpdateProfile;
 
   EditProfileDialog({
     required this.uid,
     required this.userName,
     required this.email,
+    required this.imageUrl,
     required this.onUpdateProfile,
   });
 
@@ -204,7 +209,16 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     emailController.text = widget.email;
   }
 
-  Future<void> selectImage() async {}
+  Future<void> selectImage() async {
+    final imagePicker = ImagePicker();
+    final pickedImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        selectedImage = File(pickedImage.path);
+      });
+    }
+  }
 
   Future<void> saveProfile() async {
     try {
@@ -221,33 +235,43 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         },
       );
 
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await user.updateDisplayName(userNameController.text);
+      // Upload the selected image to Firestore Storage
+      if (selectedImage != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_images/${widget.uid}');
+        await storageRef.putFile(selectedImage!);
+        final imageUrl = await storageRef.getDownloadURL();
 
-        // Update the email in Firebase Authentication
-        if (emailController.text != user.email) {
-          await user.updateEmail(emailController.text);
-        }
+        // Update the user document in Firestore with the image URL
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.uid)
+            .update({'photoUrl': imageUrl});
 
-        // Update the user document in Firestore
+        setState(() {
+          widget.onUpdateProfile(userNameController.text, imageUrl);
+        });
+      } else {
+        // Update the user document in Firestore with the updated profile information
         await FirebaseFirestore.instance
             .collection('users')
             .doc(widget.uid)
             .update({
           'displayName': userNameController.text,
           'email': emailController.text,
-          'photoUrl': selectedImage != null ? selectedImage!.path : '',
         });
-        final editedProfile = {
-          'userName': userNameController.text,
-          'email': emailController.text,
-          'photoURL': selectedImage != null ? selectedImage!.path : '',
-        };
-        Navigator.pop(context);
-        Navigator.pop(context, editedProfile);
-        widget.onUpdateProfile(userNameController.text);
+
+        widget.onUpdateProfile(userNameController.text, widget.imageUrl);
       }
+
+      final editedProfile = {
+        'userName': userNameController.text,
+        'email': emailController.text,
+        'imageUrl': widget.imageUrl,
+      };
+      Navigator.pop(context);
+      Navigator.pop(context, editedProfile);
     } catch (e) {
       print(e.toString());
       // Handle any errors that occur while saving the profile
