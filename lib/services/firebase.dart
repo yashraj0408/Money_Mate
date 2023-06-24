@@ -20,7 +20,7 @@ class FirebaseServices {
             .get();
 
         // Extract the photoURL from the document
-        userData.imageUrl = snapshot.get('photoURL') ?? '';
+        userData.imageUrl = snapshot.get('photoURL') ?? 'initial value';
       }
     } catch (e) {
       print(e.toString());
