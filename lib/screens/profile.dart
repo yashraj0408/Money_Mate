@@ -15,9 +15,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late String uid;
-  String userName = '';
+  late String userName;
   late String email;
-  String? imageUrl;
+  late String imageUrl;
 
   bool isLoading = true;
 
@@ -32,11 +32,14 @@ class _ProfilePageState extends State<ProfilePage> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         uid = user.uid;
-        if (userName.isEmpty) {
-          // Fetch the name only if it's not already stored
-          userName = user.displayName ?? '';
-        }
+        userName = user.displayName ?? '';
         email = user.email ?? '';
+        // Fetch the user document from Firestore
+        DocumentSnapshot snapshot =
+            await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+        // Extract the photoURL from the document
+        imageUrl = snapshot.get('photoURL') ?? '';
         setState(() {
           isLoading = false;
         });
@@ -69,11 +72,11 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void updateProfile(String newName, String? newUrl) {
+  void updateProfile(Map<String, dynamic> updatedData) {
     setState(() {
-      userName = newName;
-      // email = newEmail;
-      imageUrl = newUrl;
+      userName = updatedData['userName'];
+      email = updatedData['email'];
+      imageUrl = updatedData['imageUrl'];
     });
   }
 
@@ -102,8 +105,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             CircleAvatar(
                               radius: 70.0,
-                              backgroundImage: imageUrl != null
-                                  ? NetworkImage(imageUrl!)
+                              backgroundImage: imageUrl != ''
+                                  ? NetworkImage(imageUrl)
                                   : AssetImage("images/dp.png")
                                       as ImageProvider<Object>?,
                             ),
@@ -182,8 +185,8 @@ class EditProfileDialog extends StatefulWidget {
   final String uid;
   final String userName;
   final String email;
-  final String? imageUrl;
-  final Function(String, String?) onUpdateProfile;
+  final String imageUrl;
+  final Function(Map<String, dynamic>) onUpdateProfile;
 
   EditProfileDialog({
     required this.uid,
@@ -235,22 +238,24 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         },
       );
 
+      String imageUrl = '';
+
       // Upload the selected image to Firestore Storage
       if (selectedImage != null) {
         final storageRef = FirebaseStorage.instance
             .ref()
             .child('profile_images/${widget.uid}');
         await storageRef.putFile(selectedImage!);
-        final imageUrl = await storageRef.getDownloadURL();
+        imageUrl = await storageRef.getDownloadURL();
 
         // Update the user document in Firestore with the image URL
         await FirebaseFirestore.instance
             .collection('users')
             .doc(widget.uid)
-            .update({'photoUrl': imageUrl});
-
-        setState(() {
-          widget.onUpdateProfile(userNameController.text, imageUrl);
+            .update({
+          'photoURL': imageUrl,
+          'displayName': userNameController.text,
+          'email': emailController.text,
         });
       } else {
         // Update the user document in Firestore with the updated profile information
@@ -261,17 +266,22 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
           'displayName': userNameController.text,
           'email': emailController.text,
         });
-
-        widget.onUpdateProfile(userNameController.text, widget.imageUrl);
       }
+
+      widget.onUpdateProfile({
+        'userName': userNameController.text,
+        'email': emailController.text,
+        'imageUrl': imageUrl,
+      });
 
       final editedProfile = {
         'userName': userNameController.text,
         'email': emailController.text,
-        'imageUrl': widget.imageUrl,
+        'imageUrl': imageUrl,
       };
-      Navigator.pop(context);
+
       Navigator.pop(context, editedProfile);
+      Navigator.pop(context);
     } catch (e) {
       print(e.toString());
       // Handle any errors that occur while saving the profile
@@ -298,7 +308,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             SizedBox(height: 16.0),
             TextFormField(
               controller: userNameController,
-              decoration: InputDecoration(
+              decoration: kInputTextDecoration.copyWith(
                 hintText: '',
                 labelText: 'Name',
                 labelStyle: TextStyle(color: Colors.white),
@@ -307,7 +317,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             SizedBox(height: 16.0),
             TextFormField(
               controller: emailController,
-              decoration: InputDecoration(
+              decoration: kInputTextDecoration.copyWith(
                 hintText: '',
                 labelText: 'Email',
                 labelStyle: TextStyle(color: Colors.white),
@@ -324,7 +334,6 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                   ),
                 ),
                 SizedBox(width: 16.0),
-                Text(selectedImage != null ? selectedImage!.path : ''),
               ],
             ),
             SizedBox(height: 16.0),
