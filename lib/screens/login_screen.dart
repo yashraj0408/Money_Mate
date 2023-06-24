@@ -45,8 +45,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 onChanged: (value) {
                   email = value;
                 },
-                decoration:
-                    kInputTextDecoration.copyWith(hintText: 'Enter your email'),
+                decoration: kInputTextDecoration.copyWith(
+                  hintText: '',
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 15,
@@ -57,14 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   password = value;
                 },
                 decoration: kInputTextDecoration.copyWith(
-                    hintText: 'Enter your password'),
+                  hintText: '',
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 24.0,
               ),
               RoundedButton(
                 color: kPurple,
-                buttonText: 'Log in',
+                buttonText: 'Login',
                 onPressed: () async {
                   try {
                     setState(() {

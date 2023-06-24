@@ -61,8 +61,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onChanged: (value) {
                   name = value;
                 },
-                decoration:
-                    kInputTextDecoration.copyWith(hintText: 'Full name'),
+                decoration: kInputTextDecoration.copyWith(
+                  hintText: '',
+                  labelText: 'Full Name',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 15,
@@ -72,7 +75,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onChanged: (value) {
                   email = value;
                 },
-                decoration: kInputTextDecoration.copyWith(hintText: 'Email'),
+                decoration: kInputTextDecoration.copyWith(
+                  hintText: '',
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 15,
@@ -82,8 +89,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onChanged: (value) {
                   password = value;
                 },
-                decoration:
-                    kInputTextDecoration.copyWith(hintText: 'Create password'),
+                decoration: kInputTextDecoration.copyWith(
+                  hintText: '',
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
               ),
               SizedBox(
                 height: 24.0,

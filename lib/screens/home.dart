@@ -73,7 +73,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 SizedBox(height: 5),
                                 Text(
-                                  "Welcome back to Moneymate",
+                                  "Welcome to Moneymate",
                                 ),
                               ],
                             )
