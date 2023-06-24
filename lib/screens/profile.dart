@@ -225,7 +225,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         },
       );
 
-      String imageUrl = '';
+      String imageUrl = widget.imageUrl;
 
       // Upload the selected image to Firestore Storage
       if (selectedImage != null) {
@@ -320,12 +320,12 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                     backgroundColor: kPurple,
                   ),
                 ),
-                SizedBox(width: 16.0),
+                SizedBox(width: 12.0),
                 if (selectedImage != null)
                   Icon(
-                    Icons.contact_page_outlined,
-                    size: 26.0,
-                    color: kPurple,
+                    Icons.upload_file,
+                    size: 25.0,
+                    color: Colors.green,
                   ),
               ],
             ),
