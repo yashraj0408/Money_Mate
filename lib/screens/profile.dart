@@ -8,46 +8,31 @@ import 'package:money_mate/components/reusable_card.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'package:money_mate/services/firebase.dart';
+import 'package:money_mate/models/models.dart';
+
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late String uid;
-  late String userName;
-  late String email;
-  late String imageUrl;
+  UserData userData = UserData(
+    uid: 'initial value',
+    userName: 'initial value',
+    email: 'initial value',
+    imageUrl: 'initial value',
+  );
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    getUserData();
-  }
-
-  Future<void> getUserData() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        uid = user.uid;
-        userName = user.displayName ?? '';
-        email = user.email ?? '';
-        // Fetch the user document from Firestore
-        DocumentSnapshot snapshot =
-            await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
-        // Extract the photoURL from the document
-        imageUrl = snapshot.get('photoURL') ?? '';
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print(e.toString());
-      // Handle any errors that occur while fetching user data
-    }
+    FirebaseServices.getUserData(userData);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void editProfile() async {
@@ -55,28 +40,28 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return EditProfileDialog(
-          uid: uid,
-          userName: userName,
-          email: email,
-          imageUrl: imageUrl,
+          uid: userData.uid,
+          userName: userData.userName,
+          email: userData.email,
+          imageUrl: userData.imageUrl,
           onUpdateProfile: updateProfile,
         );
       },
     );
     if (result != null) {
       setState(() {
-        userName = result['userName'];
-        email = result['email'];
-        imageUrl = result['imageUrl'];
+        userData.userName = result['userName'];
+        userData.email = result['email'];
+        userData.imageUrl = result['imageUrl'];
       });
     }
   }
 
   void updateProfile(Map<String, dynamic> updatedData) {
     setState(() {
-      userName = updatedData['userName'];
-      email = updatedData['email'];
-      imageUrl = updatedData['imageUrl'];
+      userData.userName = updatedData['userName'];
+      userData.email = updatedData['email'];
+      userData.imageUrl = updatedData['imageUrl'];
     });
   }
 
@@ -105,20 +90,21 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             CircleAvatar(
                               radius: 70.0,
-                              backgroundImage: imageUrl != ''
-                                  ? NetworkImage(imageUrl)
-                                  : AssetImage("images/dp.png")
-                                      as ImageProvider<Object>?,
+                              backgroundImage:
+                                  userData.imageUrl != 'initial value'
+                                      ? NetworkImage(userData.imageUrl)
+                                      : AssetImage("images/dp.png")
+                                          as ImageProvider<Object>?,
                             ),
                             SizedBox(height: 24.0),
                             Text(
-                              userName,
+                              userData.userName,
                               style: TextStyle(
                                   fontSize: 24.0, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 8.0),
                             Text(
-                              email,
+                              userData.email,
                               style: TextStyle(fontSize: 18.0),
                             ),
                           ],
