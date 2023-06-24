@@ -22,9 +22,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    FirebaseServices.getUserData(userData);
-    setState(() {
-      isLoading = false;
+    FirebaseServices.getUserData(userData).then((_) {
+      setState(() {
+        isLoading = false;
+      });
     });
   }
 

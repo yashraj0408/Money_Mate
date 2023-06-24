@@ -25,7 +25,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       await _firestore.collection('users').doc(user.uid).set({
         'uid': user.uid,
         'displayName': name,
-        'photoURL': null, // Set initial photoURL to null or any default value
+        'photoURL': 'initial value', // Set initial photoURL to a default value
         'email': email,
       });
     } catch (e) {
