@@ -171,10 +171,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         } else if (e.code == 'invalid-email') {
                           errorMessage = 'Invalid email format.';
                         } else {
-                          errorMessage = 'Sign up failed. Please try again.';
+                          errorMessage =
+                              'Something went wrong. Please try again.';
                         }
                       } else {
-                        errorMessage = 'Sign up failed. Please try again.';
+                        errorMessage =
+                            'Something went wrong. Please try again.';
                       }
 
                       _showErrorSnackBar(errorMessage);
@@ -210,9 +212,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         "LogIn",
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ),
                       ),
                     ),
                   ],

@@ -87,28 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 24.0,
                 ),
-                // RoundedButton(
-                //   color: kPurple,
-                //   buttonText: 'Login',
-                //   onPressed: () async {
-                //     try {
-                //       setState(() {
-                //         showSpinner = true;
-                //       });
-                //       final user = await _auth.signInWithEmailAndPassword(
-                //           email: email, password: password);
-                //       if (user != null) {
-                //         Navigator.popUntil(context, ModalRoute.withName('/'));
-                //         Navigator.pushNamed(context, '/dashboard');
-                //       }
-                //       setState(() {
-                //         showSpinner = false;
-                //       });
-                //     } catch (e) {
-                //       print(e);
-                //     }
-                //   },
-                // ),
                 RoundedButton(
                   color: kPurple,
                   buttonText: 'Login',
@@ -199,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         "Sign Up",
                         style: TextStyle(color: Colors.blue),
                       ),
