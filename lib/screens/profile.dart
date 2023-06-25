@@ -351,12 +351,11 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
                   ),
                 ),
                 SizedBox(width: 12.0),
-                if (selectedImage != null)
-                  Icon(
-                    Icons.upload_file,
-                    size: 25.0,
-                    color: Colors.green,
-                  ),
+                Icon(
+                  Icons.upload_file,
+                  size: 25.0,
+                  color: selectedImage == null ? Colors.grey : Colors.green,
+                )
               ],
             ),
             SizedBox(height: 16.0),
