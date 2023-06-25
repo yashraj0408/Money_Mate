@@ -25,13 +25,18 @@ class _ProfilePageState extends State<ProfilePage> {
   );
 
   bool isLoading = true;
+  late ScaffoldMessengerState _scaffoldMessengerState;
 
   @override
   void initState() {
     super.initState();
-    FirebaseServices.getUserData(userData).then((_) {
-      setState(() {
-        isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Retrieve ScaffoldMessengerState after the widget has finished building
+      _scaffoldMessengerState = ScaffoldMessenger.of(context);
+      FirebaseServices.getUserData(userData).then((_) {
+        setState(() {
+          isLoading = false;
+        });
       });
     });
   }
@@ -64,6 +69,26 @@ class _ProfilePageState extends State<ProfilePage> {
       userData.email = updatedData['email'];
       userData.imageUrl = updatedData['imageUrl'];
     });
+
+    _scaffoldMessengerState.showSnackBar(
+      SnackBar(
+        content: Text('Profile updated successfully'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+        // action: SnackBarAction(
+        //   label: 'Dismiss',
+        //   textColor: Colors.white,
+        //   onPressed: () {
+        //     _scaffoldMessengerState.hideCurrentSnackBar();
+        //   },
+        // ),
+      ),
+    );
   }
 
   @override
@@ -112,27 +137,31 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SizedBox(height: 20.0),
-                      ElevatedButton.icon(
-                        onPressed: editProfile,
-                        icon: Icon(Icons.edit),
-                        label: Text('Edit Profile'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          textStyle: TextStyle(fontSize: 18.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                10.0), // Set your desired radius here
+                      Container(
+                        width: 160,
+                        height: 45,
+                        child: ElevatedButton.icon(
+                          onPressed: editProfile,
+                          icon: Icon(Icons.edit),
+                          label: Text('Edit Profile'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            textStyle: TextStyle(fontSize: 18.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  10.0), // Set your desired radius here
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12.0),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
                         ),
                       ),
                       SizedBox(
                         height: 25,
                       ),
                       Container(
-                        width: 150,
-                        height: 50,
+                        width: 160,
+                        height: 45,
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             try {

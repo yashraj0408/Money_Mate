@@ -37,6 +37,10 @@ class MoneyMate extends StatelessWidget {
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.white,
         ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: kLightBlue,
+          contentTextStyle: TextStyle(color: Colors.white),
+        ),
       ),
 
       initialRoute: '/',
