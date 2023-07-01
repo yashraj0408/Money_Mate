@@ -10,9 +10,9 @@ class Assets extends StatefulWidget {
 }
 
 class _AssetsState extends State<Assets> {
-  ScrollController _scrollController = ScrollController();
-  late CollectionReference _portfolioCollection;
-  late User _currentUser;
+  final ScrollController _scrollController = ScrollController();
+  CollectionReference? _portfolioCollection;
+  late User? _currentUser;
 
   @override
   void initState() {
@@ -22,16 +22,21 @@ class _AssetsState extends State<Assets> {
 
   void _initializeCurrentUser() {
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (user != null) {
-        setState(() {
-          _currentUser = user;
+      setState(() {
+        _currentUser = user;
+        if (_currentUser != null) {
           _portfolioCollection = FirebaseFirestore.instance
               .collection('portfolio')
-              .doc(_currentUser.uid)
+              .doc(_currentUser!.uid)
               .collection('items');
-        });
-      }
+        }
+      });
     });
+  }
+
+  void _navigateToPortfolioPage(String portfolioName) {
+    Navigator.pushNamed(context, '/portfolio',
+        arguments: {'portfolioName': portfolioName});
   }
 
   void _showInputDialog() {
@@ -83,8 +88,9 @@ class _AssetsState extends State<Assets> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        if (_currentUser != null) {
-                          await _portfolioCollection.add({
+                        if (_currentUser != null &&
+                            _portfolioCollection != null) {
+                          await _portfolioCollection!.add({
                             'name': inputText,
                           });
                           Navigator.of(context).pop();
@@ -106,6 +112,84 @@ class _AssetsState extends State<Assets> {
                   ],
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(String portfolioId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: kCardColor,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Delete Portfolio',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto',
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      'Are you sure you want to delete this portfolio?',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: kLightBlue),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          if (_portfolioCollection != null) {
+                            await _portfolioCollection!
+                                .doc(portfolioId)
+                                .delete();
+                          }
+                        },
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -137,7 +221,7 @@ class _AssetsState extends State<Assets> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   StreamBuilder<QuerySnapshot>(
-                    stream: _portfolioCollection.snapshots(),
+                    stream: _portfolioCollection?.snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -146,7 +230,7 @@ class _AssetsState extends State<Assets> {
                         return Text('Failed to fetch portfolio items.');
                       } else {
                         List<QueryDocumentSnapshot> documents =
-                            snapshot.data!.docs;
+                            snapshot.data?.docs ?? [];
                         bool isPortfolioEmpty = documents.isEmpty;
 
                         return Column(
@@ -163,30 +247,38 @@ class _AssetsState extends State<Assets> {
                             ),
                             if (isPortfolioEmpty) SizedBox(height: 20),
                             for (var document in documents)
-                              ReusableCard(
-                                aspectRatio: 4,
-                                colour: kCardColor,
-                                cardChild: ListTile(
-                                  title: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                        top: 0,
-                                        bottom: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          document['name'],
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 30,
+                              GestureDetector(
+                                onTap: () {
+                                  _navigateToPortfolioPage(document['name']);
+                                },
+                                onLongPress: () {
+                                  _showDeleteConfirmationDialog(document.id);
+                                },
+                                child: ReusableCard(
+                                  aspectRatio: 4,
+                                  colour: kCardColor,
+                                  cardChild: ListTile(
+                                    title: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10,
+                                          right: 10,
+                                          top: 0,
+                                          bottom: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            document['name'],
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 30,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
