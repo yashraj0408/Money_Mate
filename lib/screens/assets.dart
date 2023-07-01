@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
 
@@ -8,8 +10,29 @@ class Assets extends StatefulWidget {
 }
 
 class _AssetsState extends State<Assets> {
-  List<String> portfolioItems = [];
   ScrollController _scrollController = ScrollController();
+  late CollectionReference _portfolioCollection;
+  late User _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCurrentUser();
+  }
+
+  void _initializeCurrentUser() {
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _portfolioCollection = FirebaseFirestore.instance
+              .collection('portfolio')
+              .doc(_currentUser.uid)
+              .collection('items');
+        });
+      }
+    });
+  }
 
   void _showInputDialog() {
     showDialog(
@@ -18,10 +41,9 @@ class _AssetsState extends State<Assets> {
         String inputText = '';
 
         return Dialog(
-          backgroundColor: kCardColor, // Set the background color of the dialog
+          backgroundColor: kCardColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-                10.0), // Apply rounded corners to the dialog
+            borderRadius: BorderRadius.circular(10.0),
           ),
           child: Container(
             padding: const EdgeInsets.all(16.0),
@@ -60,19 +82,21 @@ class _AssetsState extends State<Assets> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          portfolioItems.add(inputText);
-                        });
-                        Navigator.of(context).pop();
-                        //scroll to the end
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        });
+                      onPressed: () async {
+                        if (_currentUser != null) {
+                          await _portfolioCollection.add({
+                            'name': inputText,
+                          });
+                          Navigator.of(context).pop();
+                          // Scroll to the end
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _scrollController.animateTo(
+                              _scrollController.position.maxScrollExtent,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          });
+                        }
                       },
                       child: const Text(
                         'Create',
@@ -101,7 +125,7 @@ class _AssetsState extends State<Assets> {
           ),
         ),
         centerTitle: false,
-        title: const Text('MoneyMate'),
+        title: const Text('Money Mate'),
       ),
       body: SafeArea(
         child: Center(
@@ -112,99 +136,112 @@ class _AssetsState extends State<Assets> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    portfolioItems.isEmpty
-                        ? "Seems like you don’t have any portfolio.\nCreate one.\n👇"
-                        : "Your Portfolio:",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      height: 1.7,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  if (portfolioItems.isEmpty)
-                    ElevatedButton(
-                      onPressed: _showInputDialog,
-                      child: Icon(Icons.add),
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: kPurple,
-                      ),
-                    ),
-                  if (portfolioItems.isNotEmpty)
-                    Column(
-                      children: [
-                        for (String item in portfolioItems)
-                          ReusableCard(
-                            aspectRatio: 4,
-                            colour: kCardColor,
-                            cardChild: ListTile(
-                              title: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 0, bottom: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 30,
-                                      ),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: _portfolioCollection.snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Failed to fetch portfolio items.');
+                      } else {
+                        List<QueryDocumentSnapshot> documents =
+                            snapshot.data!.docs;
+                        bool isPortfolioEmpty = documents.isEmpty;
+
+                        return Column(
+                          children: [
+                            Text(
+                              isPortfolioEmpty
+                                  ? "Seems like you don't have any portfolio.\nCreate one.\n👇"
+                                  : "Your Portfolio:",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                height: 1.7,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            if (isPortfolioEmpty) SizedBox(height: 20),
+                            for (var document in documents)
+                              ReusableCard(
+                                aspectRatio: 4,
+                                colour: kCardColor,
+                                cardChild: ListTile(
+                                  title: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                        top: 0,
+                                        bottom: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          document['name'],
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 30,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  SizedBox(
-                    height: 15,
+                            SizedBox(height: 20),
+                            if (isPortfolioEmpty)
+                              ElevatedButton(
+                                onPressed: _showInputDialog,
+                                child: Icon(Icons.add),
+                                style: ElevatedButton.styleFrom(
+                                  shape: CircleBorder(),
+                                  padding: EdgeInsets.all(16),
+                                  backgroundColor: kPurple,
+                                ),
+                              ),
+                            if (!isPortfolioEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 17, right: 17),
+                                child: ElevatedButton(
+                                  onPressed: _showInputDialog,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.add,
+                                        size: 25,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text("Add portfolio"),
+                                    ],
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          15), // Adjust the radius as needed
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14, horizontal: 24),
+                                    backgroundColor: kPurple,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      }
+                    },
                   ),
-                  if (portfolioItems.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 17, right: 17),
-                          child: ElevatedButton(
-                            onPressed: _showInputDialog,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  size: 25,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text("Add portfolio"),
-                              ],
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    15), // Adjust the radius as needed
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 14, horizontal: 24),
-                              backgroundColor: kPurple,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                 ],
               ),
             ),
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavBar(),
     );
   }
 }
