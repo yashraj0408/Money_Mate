@@ -43,6 +43,60 @@ class _PortfolioPageState extends State<PortfolioPage> {
       amount: 0.0,
       buyingPrice: 0.0,
     ),
+    Asset(
+      name: 'Litecoin',
+      symbol: 'LTC',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Ripple',
+      symbol: 'XRP',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Cardano',
+      symbol: 'ADA',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Polkadot',
+      symbol: 'DOT',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Chainlink',
+      symbol: 'LINK',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Stellar',
+      symbol: 'XLM',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'VeChain',
+      symbol: 'VET',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'Tron',
+      symbol: 'TRX',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
+    Asset(
+      name: 'EOS',
+      symbol: 'EOS',
+      amount: 0.0,
+      buyingPrice: 0.0,
+    ),
     // Add more assets here
   ];
 
@@ -187,192 +241,201 @@ class _PortfolioPageState extends State<PortfolioPage> {
         title: Text('$portfolioName Portfolio'),
       ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Text(
-                      assets.isEmpty
-                          ? "Seems like you don’t have any assets in $portfolioName Portfolio.\nAdd one.\n👇"
-                          : "Your Assets:",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        height: 1.7,
+        child: assets.isEmpty
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 120),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Text(
+                          "Seems like you don’t have any assets in $portfolioName Portfolio.\nAdd one.\n👇",
+                          style: const TextStyle(
+                              fontSize: 18, height: 1.7, color: kfadedText),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                      SizedBox(height: 20),
+                      if (assets.isEmpty)
+                        ElevatedButton(
+                          onPressed: _showInputDialog,
+                          child: Icon(Icons.add),
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(16),
+                            backgroundColor: kPurple,
+                          ),
+                        ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  if (assets.isEmpty)
-                    ElevatedButton(
-                      onPressed: _showInputDialog,
-                      child: Icon(Icons.add),
-                      style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: kPurple,
-                      ),
-                    ),
-                  if (assets.isNotEmpty)
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (Asset asset in assets)
-                          ReusableCard(
-                            colour: kCardColor,
-                            aspectRatio: 3.6,
-                            cardChild: Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(25, 21, 25, 21),
-                              child: Row(
-                                children: [
-                                  Column(
-                                    // mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            asset.symbol,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              asset.amount.toStringAsFixed(2),
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: kfadedText,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 14,
-                                          color: kfadedText,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Expanded(
-                                    child: Column(
+                ),
+              )
+            : SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (Asset asset in assets)
+                            ReusableCard(
+                              colour: kCardColor,
+                              aspectRatio: 3.6,
+                              cardChild: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(25, 21, 25, 21),
+                                child: Row(
+                                  children: [
+                                    Column(
+                                      // mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(2.0),
-                                          child: Text(
-                                            '₹ ${asset.amount.toStringAsFixed(2)}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 22,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              '-500', //total profit/gain
-                                              textAlign: TextAlign.start,
+                                              asset.symbol,
                                               style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14,
-                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                                color: Colors.white,
                                               ),
                                             ),
                                             SizedBox(
                                               width: 10,
                                             ),
-                                            Text(
-                                              '-50%', //percentage change
-                                              textAlign: TextAlign.start,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14,
-                                                color: kfadedText,
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: Text(
+                                                asset.amount.toStringAsFixed(2),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: kfadedText,
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14,
+                                            color: kfadedText,
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text(
+                                              '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 22,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                '-500', //total profit/gain
+                                                textAlign: TextAlign.start,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                '-50%', //percentage change
+                                                textAlign: TextAlign.start,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: kfadedText,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  if (assets.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 17),
-                      child: ElevatedButton(
-                        onPressed: _showInputDialog,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add,
-                              size: 25,
-                            ),
-                            Text(
-                              'Add Asset',
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                15), // Adjust the radius as needed
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14, horizontal: 24),
-                          backgroundColor: kPurple,
-                        ),
+                        ],
                       ),
-                    ),
-                ],
+                      SizedBox(
+                        height: 15,
+                      ),
+                      if (assets.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 17),
+                          child: ElevatedButton(
+                            onPressed: _showInputDialog,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  size: 25,
+                                ),
+                                Text(
+                                  'Add Asset',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    15), // Adjust the radius as needed
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 24),
+                              backgroundColor: kPurple,
+                            ),
+                          ),
+                        ),
+                      SizedBox(
+                        height: 25,
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
