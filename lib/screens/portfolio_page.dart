@@ -226,44 +226,109 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         for (Asset asset in assets)
                           ReusableCard(
                             colour: kCardColor,
-                            aspectRatio: 4,
+                            aspectRatio: 3.6,
                             cardChild: Padding(
-                              padding: const EdgeInsets.all(13.0),
-                              child: ListTile(
-                                title: Text(
-                                  asset.symbol,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 27,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  asset.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                trailing: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Amount: ${asset.amount.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: Colors.white,
+                              padding:
+                                  const EdgeInsets.fromLTRB(25, 21, 25, 21),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    // mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            asset.symbol,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 25,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text(
+                                              asset.amount.toStringAsFixed(2),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: kfadedText,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Text(
-                                      'Buying Price: \$${asset.buyingPrice.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: Colors.white,
+                                      SizedBox(
+                                        height: 10,
                                       ),
+                                      Text(
+                                        'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
+                                        textAlign: TextAlign.start,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: kfadedText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Text(
+                                            '₹ ${asset.amount.toStringAsFixed(2)}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 22,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              '-500', //total profit/gain
+                                              textAlign: TextAlign.start,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              '-50%', //percentage change
+                                              textAlign: TextAlign.start,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14,
+                                                color: kfadedText,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
