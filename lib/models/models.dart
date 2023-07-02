@@ -11,3 +11,17 @@ class UserData {
     required this.imageUrl,
   });
 }
+
+class Asset {
+  final String name;
+  final String symbol;
+  final double amount;
+  final double buyingPrice;
+
+  Asset({
+    required this.name,
+    required this.symbol,
+    required this.amount,
+    required this.buyingPrice,
+  });
+}

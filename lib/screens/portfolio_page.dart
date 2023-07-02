@@ -3,20 +3,8 @@ import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-class Asset {
-  final String name;
-  final String symbol;
-  final double amount;
-  final double buyingPrice;
-
-  Asset({
-    required this.name,
-    required this.symbol,
-    required this.amount,
-    required this.buyingPrice,
-  });
-}
+import 'package:money_mate/models/models.dart';
+import 'package:money_mate/Asset Data/supported_crypto_list.dart';
 
 class PortfolioPage extends StatefulWidget {
   @override
@@ -54,76 +42,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
           .doc(assetId);
     }
   }
-
-  List<Asset> topAssets = [
-    Asset(
-      name: 'Bitcoin',
-      symbol: 'BTC',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Ethereum',
-      symbol: 'ETH',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Litecoin',
-      symbol: 'LTC',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Ripple',
-      symbol: 'XRP',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Cardano',
-      symbol: 'ADA',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Polkadot',
-      symbol: 'DOT',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Chainlink',
-      symbol: 'LINK',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Stellar',
-      symbol: 'XLM',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'VeChain',
-      symbol: 'VET',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'Tron',
-      symbol: 'TRX',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    Asset(
-      name: 'EOS',
-      symbol: 'EOS',
-      amount: 0.0,
-      buyingPrice: 0.0,
-    ),
-    // Add more assets here
-  ];
 
   @override
   void dispose() {
@@ -374,10 +292,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                         },
                                         child: ReusableCard(
                                           colour: kCardColor,
-                                          aspectRatio: 3.6,
+                                          aspectRatio: 3.5,
                                           cardChild: Padding(
                                             padding: const EdgeInsets.fromLTRB(
-                                                25, 21, 25, 21),
+                                                20, 19, 20, 15),
                                             child: Row(
                                               children: [
                                                 Column(
@@ -428,7 +346,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                       height: 10,
                                                     ),
                                                     Text(
-                                                      'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
+                                                      'Avg. Buy:  ₹ ${asset.buyingPrice.toStringAsFixed(2)}',
                                                       textAlign:
                                                           TextAlign.start,
                                                       style: const TextStyle(
