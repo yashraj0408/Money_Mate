@@ -34,9 +34,9 @@ class _AssetsState extends State<Assets> {
     });
   }
 
-  void _navigateToPortfolioPage(String portfolioName) {
+  void _navigateToPortfolioPage(String portfolioName, String assetId) {
     Navigator.pushNamed(context, '/portfolio',
-        arguments: {'portfolioName': portfolioName});
+        arguments: {'portfolioName': portfolioName, 'assetId': assetId});
   }
 
   void _showInputDialog() {
@@ -249,7 +249,8 @@ class _AssetsState extends State<Assets> {
                             for (var document in documents)
                               GestureDetector(
                                 onTap: () {
-                                  _navigateToPortfolioPage(document['name']);
+                                  _navigateToPortfolioPage(
+                                      document['name'], document.id);
                                 },
                                 onLongPress: () {
                                   _showDeleteConfirmationDialog(document.id);

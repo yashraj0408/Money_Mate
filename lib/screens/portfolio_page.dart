@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Asset {
   final String name;
@@ -23,12 +25,32 @@ class PortfolioPage extends StatefulWidget {
 
 class _PortfolioPageState extends State<PortfolioPage> {
   String portfolioName = '';
+  String assetId = '';
+
   List<Asset> assets = [];
   ScrollController _scrollController = ScrollController();
   TextEditingController assetNameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController buyingPriceController = TextEditingController();
   int selectedAssetIndex = 0;
+
+  late User? currentUser; // Current user
+  late DocumentReference assetDocument; // Asset collection reference
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the current user
+    currentUser = FirebaseAuth.instance.currentUser;
+    // Get the asset collection reference
+    if (currentUser != null) {
+      assetDocument = FirebaseFirestore.instance
+          .collection('portfolio')
+          .doc(currentUser!.uid)
+          .collection('items')
+          .doc('asset');
+    }
+  }
 
   List<Asset> topAssets = [
     Asset(
@@ -106,6 +128,39 @@ class _PortfolioPageState extends State<PortfolioPage> {
     final Map<String, dynamic> arguments =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     portfolioName = arguments['portfolioName'] as String;
+    assetId = arguments['assetId'] as String;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    assetNameController.dispose();
+    amountController.dispose();
+    buyingPriceController.dispose();
+    super.dispose();
+  }
+
+  void _addAssetToFirestore() {
+    final asset = Asset(
+      name: topAssets[selectedAssetIndex].name,
+      symbol: topAssets[selectedAssetIndex].symbol,
+      amount: double.parse(amountController.text),
+      buyingPrice: double.parse(buyingPriceController.text),
+    );
+    FirebaseFirestore.instance
+        .collection('portfolio')
+        .doc(currentUser!.uid)
+        .collection('items')
+        .doc(assetId)
+        .collection('asset')
+        .add({
+      'name': asset.name,
+      'symbol': asset.symbol,
+      'amount': asset.amount,
+      'buyingPrice': asset.buyingPrice,
+    });
+    amountController.clear();
+    buyingPriceController.clear();
   }
 
   void _showInputDialog() {
@@ -205,8 +260,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                 buyingPrice: buyingPrice,
                               ),
                             );
-                            amountController.clear();
-                            buyingPriceController.clear();
+                            _addAssetToFirestore();
+                            // amountController.clear();
+                            // buyingPriceController.clear();
                             selectedAssetIndex = 0;
                           });
                           Navigator.of(context).pop();
@@ -302,7 +358,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                               CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              asset.symbol,
+                                              asset.symbol, //name will go here
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 25,
@@ -316,7 +372,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                               padding:
                                                   const EdgeInsets.all(2.0),
                                               child: Text(
-                                                asset.amount.toStringAsFixed(2),
+                                                asset.amount.toStringAsFixed(
+                                                    2), //amount data will go here
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
