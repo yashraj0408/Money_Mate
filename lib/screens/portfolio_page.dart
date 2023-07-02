@@ -130,8 +130,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16.0),
+                  const SizedBox(height: 25.0),
                   DropdownButtonFormField<int>(
+                    iconEnabledColor: kLightBlue,
                     value: selectedAssetIndex,
                     onChanged: (index) {
                       setState(() {
@@ -145,33 +146,32 @@ class _PortfolioPageState extends State<PortfolioPage> {
                             Text('${entry.value.name} (${entry.value.symbol})'),
                       );
                     }).toList(),
-                    decoration: InputDecoration(
+                    decoration: kInputTextDecoration.copyWith(
+                      hintText: '',
                       labelText: 'Select Asset',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      labelStyle: TextStyle(color: Colors.white),
                     ),
+                    dropdownColor: kCardColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
                     controller: amountController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: kInputTextDecoration.copyWith(
+                      hintText: '',
                       labelText: 'Amount',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
                     controller: buyingPriceController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: kInputTextDecoration.copyWith(
+                      hintText: '',
                       labelText: 'Buying Price',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -252,7 +252,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Text(
-                          "Seems like you don’t have any assets in $portfolioName Portfolio.\nAdd one.\n👇",
+                          "You don’t have any assets in \n$portfolioName Portfolio.\nAdd one.\n👇",
                           style: const TextStyle(
                               fontSize: 18, height: 1.7, color: kfadedText),
                           textAlign: TextAlign.center,

@@ -237,15 +237,15 @@ class _AssetsState extends State<Assets> {
                           children: [
                             Text(
                               isPortfolioEmpty
-                                  ? "Seems like you don't have any portfolio.\nCreate one.\n👇"
+                                  ? "You don't have any portfolio.\nCreate one.\n👇"
                                   : "Your Portfolio:",
                               style: const TextStyle(
                                 fontSize: 18,
                                 height: 1.7,
+                                color: kfadedText,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            if (isPortfolioEmpty) SizedBox(height: 20),
                             for (var document in documents)
                               GestureDetector(
                                 onTap: () {
