@@ -20,13 +20,15 @@ class Asset {
 
 class PortfolioPage extends StatefulWidget {
   @override
+  final String portfolioName;
+  final String assetId;
+
+  const PortfolioPage({required this.portfolioName, required this.assetId});
+
   _PortfolioPageState createState() => _PortfolioPageState();
 }
 
 class _PortfolioPageState extends State<PortfolioPage> {
-  String portfolioName = '';
-  String assetId = '';
-
   List<Asset> assets = [];
   ScrollController _scrollController = ScrollController();
   TextEditingController assetNameController = TextEditingController();
@@ -43,12 +45,13 @@ class _PortfolioPageState extends State<PortfolioPage> {
     // Get the current user
     currentUser = FirebaseAuth.instance.currentUser;
     // Get the asset collection reference
+    String assetId = widget.assetId;
     if (currentUser != null) {
       assetDocument = FirebaseFirestore.instance
           .collection('portfolio')
           .doc(currentUser!.uid)
           .collection('items')
-          .doc('asset');
+          .doc(assetId);
     }
   }
 
@@ -123,15 +126,6 @@ class _PortfolioPageState extends State<PortfolioPage> {
   ];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final Map<String, dynamic> arguments =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    portfolioName = arguments['portfolioName'] as String;
-    assetId = arguments['assetId'] as String;
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     assetNameController.dispose();
@@ -151,7 +145,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
         .collection('portfolio')
         .doc(currentUser!.uid)
         .collection('items')
-        .doc(assetId)
+        .doc(widget.assetId)
         .collection('asset')
         .add({
       'name': asset.name,
@@ -294,7 +288,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$portfolioName Portfolio'),
+        title: Text('${widget.portfolioName} Portfolio'),
       ),
       body: SafeArea(
         child: assets.isEmpty
@@ -308,7 +302,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Text(
-                          "You don’t have any assets in \n$portfolioName Portfolio.\nAdd one.\n👇",
+                          "You don’t have any assets in \n${widget.portfolioName} Portfolio.\nAdd one.\n👇",
                           style: const TextStyle(
                               fontSize: 18, height: 1.7, color: kfadedText),
                           textAlign: TextAlign.center,
@@ -339,117 +333,186 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          for (Asset asset in assets)
-                            ReusableCard(
-                              colour: kCardColor,
-                              aspectRatio: 3.6,
-                              cardChild: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(25, 21, 25, 21),
-                                child: Row(
+                          StreamBuilder<QuerySnapshot>(
+                              stream:
+                                  assetDocument.collection('asset').snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                }
+                                final assetsList =
+                                    snapshot.data!.docs.map((doc) {
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+                                  return Asset(
+                                    name: data['name'],
+                                    symbol: data['symbol'],
+                                    amount: data['amount'],
+                                    buyingPrice: data['buyingPrice'],
+                                  );
+                                }).toList();
+                                bool isAssetEmpty = assetsList.isEmpty;
+                                return Column(
                                   children: [
-                                    Column(
-                                      // mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              asset.symbol, //name will go here
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 25,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(2.0),
-                                              child: Text(
-                                                asset.amount.toStringAsFixed(
-                                                    2), //amount data will go here
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  color: kfadedText,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
-                                          textAlign: TextAlign.start,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 14,
-                                            color: kfadedText,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 22,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                '-500', //total profit/gain
-                                                textAlign: TextAlign.start,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text(
-                                                '-50%', //percentage change
-                                                textAlign: TextAlign.start,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14,
-                                                  color: kfadedText,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                    Text(
+                                      isAssetEmpty
+                                          ? "You don't have any Asset.\nCreate one.\n👇"
+                                          : "Your Asset:",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        height: 1.7,
+                                        color: kfadedText,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
+                                    for (var asset in assetsList)
+                                      GestureDetector(
+                                        onLongPress: () {
+                                          // _showDeleteConfirmationDialog(document.id);
+                                        },
+                                        child: ReusableCard(
+                                          colour: kCardColor,
+                                          aspectRatio: 3.6,
+                                          cardChild: Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                25, 21, 25, 21),
+                                            child: Row(
+                                              children: [
+                                                Column(
+                                                  // mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
+                                                      children: [
+                                                        Text(
+                                                          asset
+                                                              .symbol, //name will go here
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                            asset.amount
+                                                                .toStringAsFixed(
+                                                                    2), //amount data will go here
+                                                            style:
+                                                                const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16,
+                                                              color: kfadedText,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Text(
+                                                      'Avg. Buy ₹${asset.buyingPrice.toStringAsFixed(2)}',
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 14,
+                                                        color: kfadedText,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2.0),
+                                                        child: Text(
+                                                          '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 22,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Text(
+                                                            '-500', //total profit/gain
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              fontSize: 14,
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(
+                                                            '-50%', //percentage change
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              fontSize: 14,
+                                                              color: kfadedText,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                   ],
-                                ),
-                              ),
-                            ),
+                                );
+                              }),
                         ],
                       ),
                       SizedBox(

@@ -54,7 +54,7 @@ class MoneyMate extends StatelessWidget {
         '/home': (context) => Home(),
         '/assets': (context) => Assets(),
         '/profile': (context) => ProfilePage(),
-        '/portfolio': (context) => PortfolioPage(),
+        // '/portfolio': (context) => PortfolioPage(),
       },
       // home: InputPage(),
     );

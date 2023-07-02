@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
+import 'package:money_mate/screens/portfolio_page.dart';
 
 class Assets extends StatefulWidget {
   @override
@@ -35,8 +36,15 @@ class _AssetsState extends State<Assets> {
   }
 
   void _navigateToPortfolioPage(String portfolioName, String assetId) {
-    Navigator.pushNamed(context, '/portfolio',
-        arguments: {'portfolioName': portfolioName, 'assetId': assetId});
+    // Navigator.pushNamed(context, '/portfolio',
+    //     arguments: {'portfolioName': portfolioName, 'assetId': assetId});
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            PortfolioPage(portfolioName: portfolioName, assetId: assetId),
+      ),
+    );
   }
 
   void _showInputDialog() {
