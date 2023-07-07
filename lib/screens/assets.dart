@@ -35,14 +35,14 @@ class _AssetsState extends State<Assets> {
     });
   }
 
-  void _navigateToPortfolioPage(String portfolioName, String assetId) {
+  void _navigateToPortfolioPage(String portfolioName, String portfolioId) {
     // Navigator.pushNamed(context, '/portfolio',
     //     arguments: {'portfolioName': portfolioName, 'assetId': assetId});
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            PortfolioPage(portfolioName: portfolioName, assetId: assetId),
+        builder: (context) => PortfolioPage(
+            portfolioName: portfolioName, portfolioId: portfolioId),
       ),
     );
   }

@@ -9,9 +9,9 @@ import 'package:money_mate/Asset Data/supported_crypto_list.dart';
 class PortfolioPage extends StatefulWidget {
   @override
   final String portfolioName;
-  final String assetId;
+  final String portfolioId;
 
-  const PortfolioPage({required this.portfolioName, required this.assetId});
+  const PortfolioPage({required this.portfolioName, required this.portfolioId});
 
   _PortfolioPageState createState() => _PortfolioPageState();
 }
@@ -33,13 +33,13 @@ class _PortfolioPageState extends State<PortfolioPage> {
     // Get the current user
     currentUser = FirebaseAuth.instance.currentUser;
     // Get the asset collection reference
-    String assetId = widget.assetId;
+    String portfolioId = widget.portfolioId;
     if (currentUser != null) {
       assetDocument = FirebaseFirestore.instance
           .collection('portfolio')
           .doc(currentUser!.uid)
           .collection('items')
-          .doc(assetId);
+          .doc(portfolioId);
     }
   }
 
@@ -63,7 +63,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
         .collection('portfolio')
         .doc(currentUser!.uid)
         .collection('items')
-        .doc(widget.assetId)
+        .doc(widget.portfolioId)
         .collection('asset')
         .add({
       'name': asset.name,
@@ -203,6 +203,91 @@ class _PortfolioPageState extends State<PortfolioPage> {
     );
   }
 
+  void _showDeleteConfirmationDialog(String assetId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: kCardColor,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Delete Asset',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto',
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      'Are you sure you want to delete this Asset?',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: kLightBlue),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          _deleteAssetFromFirestore(assetId);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _deleteAssetFromFirestore(String assetId) {
+    FirebaseFirestore.instance
+        .collection('portfolio')
+        .doc(currentUser!.uid)
+        .collection('items')
+        .doc(widget.portfolioId)
+        .collection('asset')
+        .doc(assetId)
+        .delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,12 +318,13 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           }
                           final assetsList = snapshot.data!.docs.map((doc) {
                             final data = doc.data() as Map<String, dynamic>;
-                            return Asset(
-                              name: data['name'],
-                              symbol: data['symbol'],
-                              amount: data['amount'],
-                              buyingPrice: data['buyingPrice'],
-                            );
+                            return {
+                              'id': doc.id,
+                              'name': data['name'],
+                              'symbol': data['symbol'],
+                              'amount': data['amount'],
+                              'buyingPrice': data['buyingPrice'],
+                            };
                           }).toList();
                           bool isAssetEmpty = assetsList.isEmpty;
                           return isAssetEmpty
@@ -268,7 +354,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                             ),
                                           ),
                                           SizedBox(height: 20),
-                                          if (assets.isEmpty)
+                                          if (isAssetEmpty)
                                             ElevatedButton(
                                               onPressed: _showInputDialog,
                                               child: Icon(Icons.add),
@@ -288,7 +374,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                     for (var asset in assetsList)
                                       GestureDetector(
                                         onLongPress: () {
-                                          // _showDeleteConfirmationDialog(document.id);
+                                          _showDeleteConfirmationDialog(
+                                              asset["id"]);
                                         },
                                         child: ReusableCard(
                                           colour: kCardColor,
@@ -313,8 +400,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                                 .end,
                                                         children: [
                                                           Text(
-                                                            asset
-                                                                .symbol, //name will go here
+                                                            asset[
+                                                                "symbol"], //name will go here
                                                             style:
                                                                 const TextStyle(
                                                               fontWeight:
@@ -333,7 +420,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                                 const EdgeInsets
                                                                     .all(2.0),
                                                             child: Text(
-                                                              asset.amount
+                                                              asset["amount"]
                                                                   .toStringAsFixed(
                                                                       2), //amount data will go here
                                                               style:
@@ -353,7 +440,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                         height: 10,
                                                       ),
                                                       Text(
-                                                        'Avg. Buy:  ₹ ${asset.buyingPrice.toStringAsFixed(2)}',
+                                                        'Avg. Buy:  ₹ ${asset["buyingPrice"].toStringAsFixed(2)}',
                                                         textAlign:
                                                             TextAlign.start,
                                                         style: const TextStyle(
@@ -376,7 +463,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                               const EdgeInsets
                                                                   .all(2.0),
                                                           child: Text(
-                                                            '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
+                                                            '₹ ${asset["amount"].toStringAsFixed(2)}', //current ammount
                                                             style:
                                                                 const TextStyle(
                                                               fontWeight:
