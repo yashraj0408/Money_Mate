@@ -292,135 +292,150 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                         },
                                         child: ReusableCard(
                                           colour: kCardColor,
-                                          aspectRatio: 3.5,
+                                          aspectRatio: 4,
                                           cardChild: Padding(
                                             padding: const EdgeInsets.fromLTRB(
-                                                20, 19, 20, 15),
-                                            child: Row(
-                                              children: [
-                                                Column(
-                                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Text(
-                                                          asset
-                                                              .symbol, //name will go here
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 10,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(2.0),
-                                                          child: Text(
-                                                            asset.amount
-                                                                .toStringAsFixed(
-                                                                    2), //amount data will go here
+                                                20, 15, 20, 15),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: Row(
+                                                children: [
+                                                  Column(
+                                                    // mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Text(
+                                                            asset
+                                                                .symbol, //name will go here
                                                             style:
                                                                 const TextStyle(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize: 16,
-                                                              color: kfadedText,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    Text(
-                                                      'Avg. Buy:  ₹ ${asset.buyingPrice.toStringAsFixed(2)}',
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 14,
-                                                        color: kfadedText,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(2.0),
-                                                        child: Text(
-                                                          '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 22,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Text(
-                                                            '-500', //total profit/gain
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              fontSize: 14,
-                                                              color: Colors.red,
+                                                              fontSize: 25,
+                                                              color:
+                                                                  Colors.white,
                                                             ),
                                                           ),
                                                           SizedBox(
                                                             width: 10,
                                                           ),
-                                                          Text(
-                                                            '-50%', //percentage change
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              fontSize: 14,
-                                                              color: kfadedText,
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(2.0),
+                                                            child: Text(
+                                                              asset.amount
+                                                                  .toStringAsFixed(
+                                                                      2), //amount data will go here
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16,
+                                                                color:
+                                                                    kfadedText,
+                                                              ),
                                                             ),
                                                           ),
                                                         ],
                                                       ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Avg. Buy:  ₹ ${asset.buyingPrice.toStringAsFixed(2)}',
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 14,
+                                                          color: kfadedText,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
-                                                ),
-                                              ],
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                            '₹ ${asset.amount.toStringAsFixed(2)}', //current ammount
+                                                            style:
+                                                                const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontSize: 22,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              '-500', //total profit/gain
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 14,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Text(
+                                                              '-50%', //percentage change
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 14,
+                                                                color:
+                                                                    kfadedText,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
