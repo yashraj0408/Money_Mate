@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
@@ -29,9 +31,13 @@ class _PortfolioPageState extends State<PortfolioPage> {
   late User? currentUser; // Current user
   late DocumentReference assetDocument; // Asset collection reference
 
+  Map<String, double> cryptoDataMap = {};
+  bool isLoadingCryptoData = true;
+
   @override
   void initState() {
     super.initState();
+    fetchCryptoData();
     // Get the current user
     currentUser = FirebaseAuth.instance.currentUser;
     // Get the asset collection reference
@@ -290,17 +296,26 @@ class _PortfolioPageState extends State<PortfolioPage> {
         .delete();
   }
 
-  Future<double> fetchCurrentPrice(String cryptoName) async {
+  Future<void> fetchCryptoData() async {
+    final cryptoNames = topAssets.map((asset) => asset.name).toList();
     final url = Uri.parse(
-        'https://api.coingecko.com/api/v3/simple/price?ids=$cryptoName&vs_currencies=inr');
+        'https://api.coingecko.com/api/v3/simple/price?ids=${cryptoNames.join(',')}&vs_currencies=inr');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final price = data[cryptoName.toLowerCase()]['inr'];
-      return price.toDouble();
+      for (final asset in topAssets) {
+        final name = asset.name.toLowerCase();
+        if (data.containsKey(name)) {
+          final price = data[name]['inr'];
+          cryptoDataMap[name] = price.toDouble();
+        }
+      }
+      setState(() {
+        isLoadingCryptoData = false;
+      });
     } else {
-      throw Exception('Failed to fetch current price');
+      throw Exception('Failed to fetch crypto data');
     }
   }
 
@@ -330,6 +345,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           }
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (isLoadingCryptoData) {
                             return CircularProgressIndicator();
                           }
                           final assetsList = snapshot.data!.docs.map((doc) {
@@ -469,101 +487,89 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                     ],
                                                   ),
                                                   Expanded(
-                                                    child:
-                                                        FutureBuilder<double>(
-                                                      future: fetchCurrentPrice(
-                                                          asset["name"]),
-                                                      builder: (BuildContext
-                                                              context,
-                                                          AsyncSnapshot<double>
-                                                              snapshot) {
-                                                        if (snapshot
-                                                                .connectionState ==
-                                                            ConnectionState
-                                                                .waiting) {
-                                                          return CircularProgressIndicator();
-                                                        } else if (snapshot
-                                                            .hasError) {
-                                                          return Text(
-                                                              'Error: ${snapshot.error}');
-                                                        } else {
-                                                          final currentPrice =
-                                                              snapshot.data!;
-                                                          final currentValue =
-                                                              asset["amount"] *
-                                                                  currentPrice;
-                                                          return Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        2.0),
-                                                                child: Text(
-                                                                  '₹ ${currentValue.toStringAsFixed(2)}', //current amount
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    fontSize:
-                                                                        22,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                                ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                            '₹ ${(asset["amount"] * cryptoDataMap[asset["name"].toLowerCase()] ?? 0.0).toStringAsFixed(2)}', //current ammount
+                                                            style:
+                                                                const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontSize: 22,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              '${(asset["amount"] * (cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"])).toStringAsFixed(2)}', //total profit/gain
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 14,
+                                                                color: (asset["amount"] *
+                                                                            (cryptoDataMap[asset["name"].toLowerCase()]! -
+                                                                                asset[
+                                                                                    "buyingPrice"])) >
+                                                                        0
+                                                                    ? Colors
+                                                                        .green
+                                                                    : (asset["amount"] * (cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"])) <
+                                                                            0
+                                                                        ? Colors
+                                                                            .red
+                                                                        : kfadedText,
                                                               ),
-                                                              SizedBox(
-                                                                  height: 10),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .end,
-                                                                children: [
-                                                                  Text(
-                                                                    '-500', //total profit/gain
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .start,
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color: Colors
-                                                                          .red,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      width:
-                                                                          10),
-                                                                  Text(
-                                                                    '-50%', //percentage change
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .start,
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          kfadedText,
-                                                                    ),
-                                                                  ),
-                                                                ],
+                                                            ),
+                                                            SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Text(
+                                                              '${(((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) * 100).toStringAsFixed(2)}%', //percentage change
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize: 14,
+                                                                color: (((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) *
+                                                                            100) >
+                                                                        0
+                                                                    ? Colors
+                                                                        .green
+                                                                    : (((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) *
+                                                                                100) <
+                                                                            0
+                                                                        ? Colors
+                                                                            .red
+                                                                        : kfadedText,
                                                               ),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
