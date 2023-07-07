@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:money_mate/models/models.dart';
 import 'package:money_mate/Asset Data/supported_crypto_list.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class PortfolioPage extends StatefulWidget {
   @override
@@ -288,6 +290,20 @@ class _PortfolioPageState extends State<PortfolioPage> {
         .delete();
   }
 
+  Future<double> fetchCurrentPrice(String cryptoName) async {
+    final url = Uri.parse(
+        'https://api.coingecko.com/api/v3/simple/price?ids=$cryptoName&vs_currencies=inr');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final price = data[cryptoName.toLowerCase()]['inr'];
+      return price.toDouble();
+    } else {
+      throw Exception('Failed to fetch current price');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -401,7 +417,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                         children: [
                                                           Text(
                                                             asset[
-                                                                "symbol"], //name will go here
+                                                                "symbol"], //name will go here | left
                                                             style:
                                                                 const TextStyle(
                                                               fontWeight:
@@ -422,7 +438,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                             child: Text(
                                                               asset["amount"]
                                                                   .toStringAsFixed(
-                                                                      2), //amount data will go here
+                                                                      2), //amount data will go here | left
                                                               style:
                                                                   const TextStyle(
                                                                 fontWeight:
@@ -440,7 +456,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                         height: 10,
                                                       ),
                                                       Text(
-                                                        'Avg. Buy:  ₹ ${asset["buyingPrice"].toStringAsFixed(2)}',
+                                                        'Avg. Buy:  ₹ ${asset["buyingPrice"].toStringAsFixed(2)}', //left
                                                         textAlign:
                                                             TextAlign.start,
                                                         style: const TextStyle(
@@ -453,72 +469,101 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                     ],
                                                   ),
                                                   Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(2.0),
-                                                          child: Text(
-                                                            '₹ ${asset["amount"].toStringAsFixed(2)}', //current ammount
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontSize: 22,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            Text(
-                                                              '-500', //total profit/gain
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                fontSize: 14,
-                                                                color:
-                                                                    Colors.red,
+                                                    child:
+                                                        FutureBuilder<double>(
+                                                      future: fetchCurrentPrice(
+                                                          asset["name"]),
+                                                      builder: (BuildContext
+                                                              context,
+                                                          AsyncSnapshot<double>
+                                                              snapshot) {
+                                                        if (snapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .waiting) {
+                                                          return CircularProgressIndicator();
+                                                        } else if (snapshot
+                                                            .hasError) {
+                                                          return Text(
+                                                              'Error: ${snapshot.error}');
+                                                        } else {
+                                                          final currentPrice =
+                                                              snapshot.data!;
+                                                          final currentValue =
+                                                              asset["amount"] *
+                                                                  currentPrice;
+                                                          return Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .all(
+                                                                        2.0),
+                                                                child: Text(
+                                                                  '₹ ${currentValue.toStringAsFixed(2)}', //current amount
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontSize:
+                                                                        22,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
                                                               ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Text(
-                                                              '-50%', //percentage change
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                fontSize: 14,
-                                                                color:
-                                                                    kfadedText,
+                                                              SizedBox(
+                                                                  height: 10),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .end,
+                                                                children: [
+                                                                  Text(
+                                                                    '-500', //total profit/gain
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .start,
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                      width:
+                                                                          10),
+                                                                  Text(
+                                                                    '-50%', //percentage change
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .start,
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color:
+                                                                          kfadedText,
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                            ],
+                                                          );
+                                                        }
+                                                      },
                                                     ),
                                                   ),
                                                 ],
