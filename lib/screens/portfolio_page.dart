@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:money_mate/components/reusable_card.dart';
 import 'package:money_mate/constants.dart';
@@ -43,11 +41,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
     // Get the asset collection reference
     String portfolioId = widget.portfolioId;
     if (currentUser != null) {
-      assetDocument = FirebaseFirestore.instance
-          .collection('portfolio')
-          .doc(currentUser!.uid)
-          .collection('items')
-          .doc(portfolioId);
+      assetDocument = FirebaseFirestore.instance.collection('portfolio').doc(currentUser!.uid).collection('items').doc(portfolioId);
     }
   }
 
@@ -67,13 +61,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
       amount: double.parse(amountController.text),
       buyingPrice: double.parse(buyingPriceController.text),
     );
-    FirebaseFirestore.instance
-        .collection('portfolio')
-        .doc(currentUser!.uid)
-        .collection('items')
-        .doc(widget.portfolioId)
-        .collection('asset')
-        .add({
+    FirebaseFirestore.instance.collection('portfolio').doc(currentUser!.uid).collection('items').doc(widget.portfolioId).collection('asset').add({
       'name': asset.name,
       'symbol': asset.symbol,
       'amount': asset.amount,
@@ -118,8 +106,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                     items: topAssets.asMap().entries.map((entry) {
                       return DropdownMenuItem<int>(
                         value: entry.key,
-                        child:
-                            Text('${entry.value.name} (${entry.value.symbol})'),
+                        child: Text('${entry.value.name} (${entry.value.symbol})'),
                       );
                     }).toList(),
                     decoration: kInputTextDecoration.copyWith(
@@ -166,13 +153,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            String assetName =
-                                topAssets[selectedAssetIndex].name;
-                            String symbol =
-                                topAssets[selectedAssetIndex].symbol;
+                            String assetName = topAssets[selectedAssetIndex].name;
+                            String symbol = topAssets[selectedAssetIndex].symbol;
                             double amount = double.parse(amountController.text);
-                            double buyingPrice =
-                                double.parse(buyingPriceController.text);
+                            double buyingPrice = double.parse(buyingPriceController.text);
                             assets.add(
                               Asset(
                                 name: assetName,
@@ -286,20 +270,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   void _deleteAssetFromFirestore(String assetId) {
-    FirebaseFirestore.instance
-        .collection('portfolio')
-        .doc(currentUser!.uid)
-        .collection('items')
-        .doc(widget.portfolioId)
-        .collection('asset')
-        .doc(assetId)
-        .delete();
+    FirebaseFirestore.instance.collection('portfolio').doc(currentUser!.uid).collection('items').doc(widget.portfolioId).collection('asset').doc(assetId).delete();
   }
 
   Future<void> fetchCryptoData() async {
     final cryptoNames = topAssets.map((asset) => asset.name).toList();
-    final url = Uri.parse(
-        'https://api.coingecko.com/api/v3/simple/price?ids=${cryptoNames.join(',')}&vs_currencies=inr');
+    final url = Uri.parse('https://api.coingecko.com/api/v3/simple/price?ids=${cryptoNames.join(',')}&vs_currencies=inr');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -338,13 +314,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
                   children: [
                     StreamBuilder<QuerySnapshot>(
                         stream: assetDocument.collection('asset').snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           }
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
                             return CircularProgressIndicator();
                           }
                           if (isLoadingCryptoData) {
@@ -352,12 +326,23 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           }
                           final assetsList = snapshot.data!.docs.map((doc) {
                             final data = doc.data() as Map<String, dynamic>;
+                            final name = data['name'];
+                            final symbol = data['symbol'];
+                            final amount = data['amount'];
+                            final buyingPrice = data['buyingPrice'];
+                            final currentValue = amount * (cryptoDataMap[name.toLowerCase()] ?? 0.0);
+                            final priceChange = currentValue - (amount * buyingPrice);
+                            final percentageChange = (priceChange / (amount * buyingPrice)) * 100;
+
                             return {
                               'id': doc.id,
-                              'name': data['name'],
-                              'symbol': data['symbol'],
-                              'amount': data['amount'],
-                              'buyingPrice': data['buyingPrice'],
+                              'name': name,
+                              'symbol': symbol,
+                              'amount': amount,
+                              'buyingPrice': buyingPrice,
+                              'currentValue': currentValue,
+                              'priceChange': priceChange,
+                              'percentageChange': percentageChange,
                             };
                           }).toList();
                           bool isAssetEmpty = assetsList.isEmpty;
@@ -365,24 +350,18 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               ? SingleChildScrollView(
                                   child: Center(
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              4),
+                                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height / 4),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 20),
+                                            padding: const EdgeInsets.only(left: 20, right: 20),
                                             child: Text(
                                               "You don’t have any assets in \n${widget.portfolioName} Portfolio.\nAdd one.\n👇",
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 height: 1.7,
-                                                color: kfadedText,
+                                                color: kFadedText,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -408,104 +387,77 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                     for (var asset in assetsList)
                                       GestureDetector(
                                         onLongPress: () {
-                                          _showDeleteConfirmationDialog(
-                                              asset["id"]);
+                                          _showDeleteConfirmationDialog(asset["id"]);
                                         },
                                         child: ReusableCard(
                                           colour: kCardColor,
-                                          aspectRatio: 4,
+                                          aspectRatio: 3.5,
                                           cardChild: Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                20, 15, 20, 15),
+                                            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(2.0),
+                                              padding: const EdgeInsets.all(2.0),
                                               child: Row(
                                                 children: [
                                                   Column(
                                                     // mainAxisAlignment: MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Text(
-                                                            asset[
-                                                                "symbol"], //name will go here | left
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 25,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(2.0),
-                                                            child: Text(
-                                                              asset["amount"]
-                                                                  .toStringAsFixed(
-                                                                      2), //amount data will go here | left
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 16,
-                                                                color:
-                                                                    kfadedText,
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 4),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                          children: [
+                                                            Text(
+                                                              asset["symbol"], //name will go here | left
+                                                              style: const TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 27,
+                                                                color: Colors.white,
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Padding(
+                                                              padding: const EdgeInsets.all(2.0),
+                                                              child: Text(
+                                                                asset["amount"].toStringAsFixed(2), //amount data will go here | left
+                                                                style: const TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 16,
+                                                                  color: kFadedText,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                       SizedBox(
-                                                        height: 10,
+                                                        height: 13,
                                                       ),
                                                       Text(
-                                                        'Avg. Buy:  ₹ ${asset["buyingPrice"].toStringAsFixed(2)}', //left
-                                                        textAlign:
-                                                            TextAlign.start,
+                                                        'Avg. Buy:  ₹${asset["buyingPrice"].toStringAsFixed(2)}', //left
+                                                        textAlign: TextAlign.start,
                                                         style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
+                                                          fontWeight: FontWeight.w400,
                                                           fontSize: 14,
-                                                          color: kfadedText,
+                                                          color: kFadedText,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
                                                       children: [
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(2.0),
+                                                          padding: const EdgeInsets.all(2.0),
                                                           child: Text(
-                                                            '₹ ${(asset["amount"] * cryptoDataMap[asset["name"].toLowerCase()] ?? 0.0).toStringAsFixed(2)}', //current ammount
-                                                            style:
-                                                                const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
+                                                            '₹${(asset["currentValue"]).toStringAsFixed(2)}', //current ammount
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.w600,
                                                               fontSize: 22,
-                                                              color:
-                                                                  Colors.white,
+                                                              color: Colors.white,
                                                             ),
                                                           ),
                                                         ),
@@ -513,58 +465,47 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                                           height: 10,
                                                         ),
                                                         Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
+                                                          mainAxisAlignment: MainAxisAlignment.end,
                                                           children: [
                                                             Text(
-                                                              '${(asset["amount"] * (cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"])).toStringAsFixed(2)}', //total profit/gain
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
+                                                              '${asset["priceChange"] >= 0 ? '+' : '-'}${(asset["priceChange"]).abs().toStringAsFixed(2)}', //total profit/gain
+                                                              textAlign: TextAlign.start,
                                                               style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
+                                                                fontWeight: FontWeight.w500,
                                                                 fontSize: 14,
-                                                                color: (asset["amount"] *
-                                                                            (cryptoDataMap[asset["name"].toLowerCase()]! -
-                                                                                asset[
-                                                                                    "buyingPrice"])) >
-                                                                        0
-                                                                    ? Colors
-                                                                        .green
-                                                                    : (asset["amount"] * (cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"])) <
-                                                                            0
-                                                                        ? Colors
-                                                                            .red
-                                                                        : kfadedText,
+                                                                color: (asset["priceChange"]) >= 0 ? kLightGreen : kLightRed,
                                                               ),
                                                             ),
                                                             SizedBox(
                                                               width: 10,
                                                             ),
-                                                            Text(
-                                                              '${(((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) * 100).toStringAsFixed(2)}%', //percentage change
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                fontSize: 14,
-                                                                color: (((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) *
-                                                                            100) >
-                                                                        0
-                                                                    ? Colors
-                                                                        .green
-                                                                    : (((cryptoDataMap[asset["name"].toLowerCase()]! - asset["buyingPrice"]) / asset["buyingPrice"]) *
-                                                                                100) <
-                                                                            0
-                                                                        ? Colors
-                                                                            .red
-                                                                        : kfadedText,
+                                                            Container(
+                                                              padding: EdgeInsets.fromLTRB(4, 4, 8, 4),
+                                                              decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.circular(6),
+                                                                color: ((asset["percentageChange"])) > 0
+                                                                    ? kDarkGreen
+                                                                    : ((asset["percentageChange"])) < 0
+                                                                        ? kDarkRed
+                                                                        : kFadedText,
+                                                              ),
+                                                              child: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    asset["percentageChange"] >= 0 ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                                                    size: 18,
+                                                                    color: asset["percentageChange"] >= 0 ? kLightGreen : kLightRed,
+                                                                  ),
+                                                                  Text(
+                                                                    '${(asset["percentageChange"]).abs().toStringAsFixed(1)}%', //percentage change
+                                                                    textAlign: TextAlign.start,
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.w600,
+                                                                      fontSize: 14,
+                                                                      color: asset["percentageChange"] >= 0 ? kLightGreen : kLightRed,
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ),
                                                           ],
@@ -580,13 +521,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                       ),
                                     SizedBox(height: 20),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 17),
+                                      padding: const EdgeInsets.symmetric(horizontal: 17),
                                       child: ElevatedButton(
                                         onPressed: _showInputDialog,
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.add,
@@ -602,11 +541,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                         ),
                                         style: ElevatedButton.styleFrom(
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                15), // Adjust the radius as needed
+                                            borderRadius: BorderRadius.circular(15), // Adjust the radius as needed
                                           ),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 14, horizontal: 24),
+                                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                                           backgroundColor: kPurple,
                                         ),
                                       ),

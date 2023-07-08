@@ -42,8 +42,12 @@ const kPurple = Color(0xff8d48e4);
 const kLightBlue = Color(0xff18bbf8);
 const kCardColor = Color(0xff233446);
 const kNavbarColor = Color(0xff203040);
-const kfadedText = Color(0xff6a7e8f);
-const ktextColor = Color(0xffe8f4fe);
+const kFadedText = Color(0xff6a7e8f);
+const kTextColor = Color(0xffe8f4fe);
+const kDarkRed = Color(0xff502732);
+const kLightRed = Color(0xfffd2729);
+const kDarkGreen = Color(0xff184637);
+const kLightGreen = Color(0xff15b153);
 // const kCardColor = Colors.blue;
 // bg blue -> #17183c
 // purple -> #8d48e4

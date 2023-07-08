@@ -26,10 +26,7 @@ class _AssetsState extends State<Assets> {
       setState(() {
         _currentUser = user;
         if (_currentUser != null) {
-          _portfolioCollection = FirebaseFirestore.instance
-              .collection('portfolio')
-              .doc(_currentUser!.uid)
-              .collection('items');
+          _portfolioCollection = FirebaseFirestore.instance.collection('portfolio').doc(_currentUser!.uid).collection('items');
         }
       });
     });
@@ -41,8 +38,7 @@ class _AssetsState extends State<Assets> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PortfolioPage(
-            portfolioName: portfolioName, portfolioId: portfolioId),
+        builder: (context) => PortfolioPage(portfolioName: portfolioName, portfolioId: portfolioId),
       ),
     );
   }
@@ -96,8 +92,7 @@ class _AssetsState extends State<Assets> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        if (_currentUser != null &&
-                            _portfolioCollection != null) {
+                        if (_currentUser != null && _portfolioCollection != null) {
                           await _portfolioCollection!.add({
                             'name': inputText,
                           });
@@ -184,9 +179,7 @@ class _AssetsState extends State<Assets> {
                         onPressed: () async {
                           Navigator.of(context).pop();
                           if (_portfolioCollection != null) {
-                            await _portfolioCollection!
-                                .doc(portfolioId)
-                                .delete();
+                            await _portfolioCollection!.doc(portfolioId).delete();
                           }
                         },
                         child: Text(
@@ -210,8 +203,7 @@ class _AssetsState extends State<Assets> {
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
-          padding:
-              const EdgeInsets.only(left: 15.0, right: 0, top: 2, bottom: 2),
+          padding: const EdgeInsets.only(left: 15.0, right: 0, top: 2, bottom: 2),
           child: Image.asset(
             'images/logo.png',
           ),
@@ -230,35 +222,30 @@ class _AssetsState extends State<Assets> {
                 children: [
                   StreamBuilder<QuerySnapshot>(
                     stream: _portfolioCollection?.snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return CircularProgressIndicator();
                       } else if (snapshot.hasError) {
                         return Text('Failed to fetch portfolio items.');
                       } else {
-                        List<QueryDocumentSnapshot> documents =
-                            snapshot.data?.docs ?? [];
+                        List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
                         bool isPortfolioEmpty = documents.isEmpty;
 
                         return Column(
                           children: [
                             Text(
-                              isPortfolioEmpty
-                                  ? "You don't have any portfolio.\nCreate one.\n👇"
-                                  : "Your Portfolio:",
+                              isPortfolioEmpty ? "You don't have any portfolio.\nCreate one.\n👇" : "Your Portfolio:",
                               style: const TextStyle(
                                 fontSize: 18,
                                 height: 1.7,
-                                color: kfadedText,
+                                color: kFadedText,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             for (var document in documents)
                               GestureDetector(
                                 onTap: () {
-                                  _navigateToPortfolioPage(
-                                      document['name'], document.id);
+                                  _navigateToPortfolioPage(document['name'], document.id);
                                 },
                                 onLongPress: () {
                                   _showDeleteConfirmationDialog(document.id);
@@ -268,16 +255,10 @@ class _AssetsState extends State<Assets> {
                                   colour: kCardColor,
                                   cardChild: ListTile(
                                     title: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                          top: 0,
-                                          bottom: 10),
+                                      padding: const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 10),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             document['name'],
@@ -305,8 +286,7 @@ class _AssetsState extends State<Assets> {
                               ),
                             if (!isPortfolioEmpty)
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 17, right: 17),
+                                padding: const EdgeInsets.only(left: 17, right: 17),
                                 child: ElevatedButton(
                                   onPressed: _showInputDialog,
                                   child: Row(
@@ -323,11 +303,9 @@ class _AssetsState extends State<Assets> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          15), // Adjust the radius as needed
+                                      borderRadius: BorderRadius.circular(15), // Adjust the radius as needed
                                     ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 14, horizontal: 24),
+                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                                     backgroundColor: kPurple,
                                   ),
                                 ),
