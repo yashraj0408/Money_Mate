@@ -1,6 +1,6 @@
 # money_mate
 
-A portfolio management App.
+One stop app to see how your money performs. ⚡
 
 ## Getting Started
 
