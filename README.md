@@ -2,6 +2,14 @@
 
 One stop app to see how your money performs. ⚡
 
+##Screenshots
+![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s1.png)
+![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s2.jpg)
+![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s3.png)
+![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s4.jpg)
+![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s5.jpg)
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
