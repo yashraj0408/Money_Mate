@@ -2,12 +2,18 @@
 
 One stop app to see how your money performs. ⚡
 
-##Screenshots
-![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s1.png)
-![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s2.jpg)
-![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s3.png)
-![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s4.jpg)
-![Alt Text](https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s5.jpg)
+## Screenshots
+
+
+<table>
+  <tr>
+    <td><img src="https://github.com/yashraj0408/Money_Mate/raw/master/screenshots/s1.png" alt="Screenshot 1" width="300"></td>
+    <td><img src="https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s2.jpg" alt="Screenshot 2" width="300"></td>
+    <td><img src="https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s3.png" alt="Screenshot 3" width="300"></td>
+    <td><img src="https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s4.jpg" alt="Screenshot 4" width="300"></td>
+    <td><img src="https://github.com/yashraj0408/Money_Mate/blob/master/screenshots/s5.jpg" alt="Screenshot 5" width="300"></td>
+  </tr>
+</table>
 
 
 ## Getting Started
