@@ -36,4 +36,7 @@ List<Asset> topAssets = [
   Asset(id: 'wazirx', name: 'WazirX', symbol: 'WRX', amount: 0.0, buyingPrice: 0.0),
   Asset(id: 'ftx-token', name: 'FTX Token', symbol: 'FTT', amount: 0.0, buyingPrice: 0.0),
   Asset(id: 'truefi', name: 'TrueFi', symbol: 'TRU', amount: 0.0, buyingPrice: 0.0),
+  Asset(id: 'gala', name: 'Gala', symbol: 'GALA', amount: 0.0, buyingPrice: 0.0),
+  Asset(id: 'injective-protocol', name: 'Injective Protocol', symbol: 'INJ', amount: 0.0, buyingPrice: 0.0),
+  Asset(id: 'verge', name: 'Verge', symbol: 'XVG', amount: 0.0, buyingPrice: 0.0),
 ];
