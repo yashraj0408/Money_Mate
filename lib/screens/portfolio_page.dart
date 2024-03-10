@@ -330,12 +330,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           }
                           final assetsList = snapshot.data!.docs.map((doc) {
                             final data = doc.data() as Map<String, dynamic>;
-                            final crypId = data['id'];
+                            final cryptoId = data['id'];
                             final name = data['name'];
                             final symbol = data['symbol'];
                             final amount = data['amount'];
                             final buyingPrice = data['buyingPrice'];
-                            final currentValue = amount * (cryptoDataMap[crypId] ?? 0.0);
+                            final currentValue = amount * (cryptoDataMap[cryptoId] ?? 0.0);
                             final priceChange = currentValue - (amount * buyingPrice);
                             final percentageChange = (priceChange / (amount * buyingPrice)) * 100;
 
@@ -351,6 +351,24 @@ class _PortfolioPageState extends State<PortfolioPage> {
                             };
                           }).toList();
                           bool isAssetEmpty = assetsList.isEmpty;
+
+                          String calculateTotalValue(List<Map<String, dynamic>> assetsList) {
+                            double totalValue = 0.0;
+                            for (var asset in assetsList) {
+                              totalValue += asset["currentValue"];
+                            }
+                            return totalValue.toStringAsFixed(2);
+                          }
+
+                          String calculateTotalValueInDollar(List<Map<String, dynamic>> assetsList) {
+                            double totalValue = 0.0;
+                            for (var asset in assetsList) {
+                              totalValue += asset["currentValue"];
+                            }
+                            totalValue /= 90;
+                            return totalValue.toStringAsFixed(2);
+                          }
+
                           return isAssetEmpty
                               ? SingleChildScrollView(
                                   child: Center(
@@ -389,6 +407,46 @@ class _PortfolioPageState extends State<PortfolioPage> {
                                 )
                               : Column(
                                   children: [
+                                    ReusableCard(
+                                        colour: kBgColor,
+                                        aspectRatio: 3.5,
+                                        cardChild: Padding(
+                                          padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
+                                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                            Text(
+                                              "Total Balance (INR)",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              '₹${calculateTotalValue(assetsList)}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 36,
+                                                color: Colors.white,
+                                              ),
+                                              //sum of all current value from all below cards],
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              '≈\$${(calculateTotalValueInDollar(assetsList))}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 17,
+                                                color: kFadedText,
+                                              ),
+                                              //sum of all current value from all below cards],
+                                            ),
+                                          ]),
+                                        )),
                                     for (var asset in assetsList)
                                       GestureDetector(
                                         onLongPress: () {
