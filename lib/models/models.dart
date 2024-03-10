@@ -13,12 +13,14 @@ class UserData {
 }
 
 class Asset {
+  final String id;
   final String name;
   final String symbol;
   final double amount;
   final double buyingPrice;
 
   Asset({
+    required this.id,
     required this.name,
     required this.symbol,
     required this.amount,

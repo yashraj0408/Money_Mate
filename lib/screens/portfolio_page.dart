@@ -56,12 +56,14 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
   void _addAssetToFirestore() {
     final asset = Asset(
+      id: topAssets[selectedAssetIndex].id,
       name: topAssets[selectedAssetIndex].name,
       symbol: topAssets[selectedAssetIndex].symbol,
       amount: double.parse(amountController.text),
       buyingPrice: double.parse(buyingPriceController.text),
     );
     FirebaseFirestore.instance.collection('portfolio').doc(currentUser!.uid).collection('items').doc(widget.portfolioId).collection('asset').add({
+      'id': asset.id,
       'name': asset.name,
       'symbol': asset.symbol,
       'amount': asset.amount,
@@ -153,12 +155,14 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       TextButton(
                         onPressed: () {
                           setState(() {
+                            String cryptoId = topAssets[selectedAssetIndex].id;
                             String assetName = topAssets[selectedAssetIndex].name;
                             String symbol = topAssets[selectedAssetIndex].symbol;
                             double amount = double.parse(amountController.text);
                             double buyingPrice = double.parse(buyingPriceController.text);
                             assets.add(
                               Asset(
+                                id: cryptoId,
                                 name: assetName,
                                 symbol: symbol,
                                 amount: amount,
@@ -274,17 +278,17 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   Future<void> fetchCryptoData() async {
-    final cryptoNames = topAssets.map((asset) => asset.name).toList();
-    final url = Uri.parse('https://api.coingecko.com/api/v3/simple/price?ids=${cryptoNames.join(',')}&vs_currencies=inr');
+    final cryptoId = topAssets.map((asset) => asset.id).toList();
+    final url = Uri.parse('https://api.coingecko.com/api/v3/simple/price?ids=${cryptoId.join(',')}&vs_currencies=inr');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       for (final asset in topAssets) {
-        final name = asset.name.toLowerCase();
-        if (data.containsKey(name)) {
-          final price = data[name]['inr'];
-          cryptoDataMap[name] = price.toDouble();
+        final crypId = asset.id;
+        if (data.containsKey(crypId)) {
+          final price = data[crypId]['inr'];
+          cryptoDataMap[crypId] = price.toDouble();
         }
       }
       setState(() {
@@ -326,11 +330,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
                           }
                           final assetsList = snapshot.data!.docs.map((doc) {
                             final data = doc.data() as Map<String, dynamic>;
+                            final crypId = data['id'];
                             final name = data['name'];
                             final symbol = data['symbol'];
                             final amount = data['amount'];
                             final buyingPrice = data['buyingPrice'];
-                            final currentValue = amount * (cryptoDataMap[name.toLowerCase()] ?? 0.0);
+                            final currentValue = amount * (cryptoDataMap[crypId] ?? 0.0);
                             final priceChange = currentValue - (amount * buyingPrice);
                             final percentageChange = (priceChange / (amount * buyingPrice)) * 100;
 
